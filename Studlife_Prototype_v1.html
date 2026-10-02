@@ -1,0 +1,2252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudLife - Application</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(160deg, #FFF6EE 0%, #FFEDE0 100%);
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+  .phone {
+    background: #ffffff;
+    border-radius: 28px;
+    border: none;
+    overflow: hidden;
+    width: 340px;
+    height: 660px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(232,90,59,0.18), 0 4px 14px rgba(232,90,59,0.10);
+  }
+  .page { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+  .page.active { display: flex; }
+  button, .clickable { cursor: pointer; border: none; background: none; font: inherit; }
+
+  .home-header { background: linear-gradient(135deg, #FF7A5C 0%, #FFB347 100%); padding: 20px 20px 26px; border-radius: 0 0 28px 28px; }
+  .home-header .top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .home-header .top-row span { font-size: 19px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+  .home-header .top-row i { font-size: 19px; color: #fff; }
+  .search-bar { background: #fff; border-radius: 14px; padding: 13px 15px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+  .search-bar i.search-icon { font-size: 16px; color: #C9A896; }
+  .search-bar span { font-size: 13px; color: #A0897A; flex: 1; }
+  .search-btn { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #FF7A5C, #FFB347); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .search-btn i { color: #fff; font-size: 14px; }
+
+  .content { flex: 1; padding: 18px 20px; overflow-y: auto; }
+  .label { font-size: 12px; color: #B0998A; margin: 4px 0 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+  .suggestions, .posts { display: flex; flex-direction: column; gap: 10px; }
+  .suggestion { border: 1px solid #F5E6D8; background: #FFFBF7; border-radius: 16px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; transition: transform 0.15s, box-shadow 0.15s; }
+  .suggestion:active { background: #FFF1E6; transform: scale(0.98); }
+  .icon-box { width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .bg-blue { background: #FFE1D2; } .text-blue { color: #FF6B4A; }
+  .bg-green { background: #EAF0DC; } .text-green { color: #7C9152; }
+  .bg-orange { background: #FFE9C2; } .text-orange { color: #E0921E; }
+  .bg-red { background: #FFD9CE; } .text-red { color: #E8593F; }
+  .suggestion span { font-size: 13.5px; color: #3A2E28; font-weight: 500; }
+
+  .navbar { display: flex; justify-content: space-around; border-top: 1px solid #F5E6D8; padding: 10px 0 14px; background: #fff; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 10px; }
+  .nav-item i { font-size: 19px; color: #D8C4B4; }
+  .nav-item span { font-size: 10px; color: #D8C4B4; font-weight: 500; }
+  .nav-item.active i, .nav-item.active span { color: #FF6B4A; }
+
+  .comm-header { padding: 18px 20px 12px; display: flex; align-items: center; justify-content: space-between; }
+  .comm-header span { font-size: 19px; font-weight: 700; color: #3A2E28; }
+  .comm-header i { font-size: 19px; color: #B0998A; }
+
+  .groups-row { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 14px; }
+  .group-card { border: 1px solid #F5E6D8; background: #FFFBF7; border-radius: 16px; padding: 12px; min-width: 112px; flex-shrink: 0; }
+  .group-card p.title { font-size: 12px; font-weight: 600; margin: 0 0 2px; color: #3A2E28; }
+  .group-card p.members { font-size: 11px; color: #B0998A; margin: 0; }
+  .group-card { cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; }
+  .group-card:hover { box-shadow: 0 8px 20px rgba(232,90,59,0.12); }
+  .group-card:active { transform: scale(0.97); background: #FFF1E6; }
+  .you-tag { font-size: 10px; background: #FFE1D2; color: #FF6B4A; padding: 2px 6px; border-radius: 6px; font-weight: 600; margin-left: 4px; }
+  .post-menu-btn { cursor: pointer; font-weight: 700; padding: 2px 8px; color: #B0998A; font-size: 16px; line-height: 1; }
+  .post-menu { background: #fff; border: 1px solid #F0DFCF; border-radius: 10px; padding: 4px 0; margin: 6px 0 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .post-menu div { padding: 8px 14px; font-size: 12.5px; cursor: pointer; color: #3A2E28; }
+  .post-menu div:active { background: #FFF1E6; }
+  .edit-post-textarea { width: 100%; border: 1px solid #F0DFCF; border-radius: 10px; padding: 10px; font-size: 13px; font-family: inherit; margin-bottom: 8px; resize: none; color: #3A2E28; }
+  .edit-post-actions { display: flex; gap: 8px; margin-bottom: 10px; }
+  .edit-post-actions .publish-btn, .edit-post-actions .secondary-btn { width: auto; padding: 8px 16px; }
+
+  /* Fenêtre de confirmation intégrée (remplace la boîte native confirm(), souvent bloquée dans les aperçus) */
+  .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(58,46,40,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
+  .modal-box { background: #fff; border-radius: 18px; padding: 22px 18px; width: 100%; text-align: center; box-shadow: 0 16px 40px rgba(0,0,0,0.25); }
+  .modal-title { font-size: 14px; font-weight: 600; color: #3A2E28; margin: 0 0 18px; line-height: 1.5; }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-actions button { flex: 1; margin: 0; }
+  .modal-delete-btn { background: #E8593F; color: #fff; text-align: center; border-radius: 12px; padding: 12px 0; font-size: 13.5px; font-weight: 700; }
+
+  .post { border: 1px solid #F5E6D8; background: #FFFBF7; border-radius: 18px; padding: 14px; margin-bottom: 10px; }
+  .post-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .post-head p.name { font-size: 12.5px; font-weight: 600; margin: 0; color: #3A2E28; }
+  .post-head p.meta { font-size: 10px; color: #B0998A; margin: 0; }
+  .post p.body { font-size: 12.5px; margin: 0 0 8px; color: #7A6558; line-height: 1.4; }
+  .post-actions { display: flex; gap: 14px; }
+  .post-actions span { font-size: 11px; color: #B0998A; display: flex; align-items: center; gap: 4px; }
+
+  .join-btn { position: absolute; bottom: 78px; right: 18px; background: linear-gradient(135deg, #FF7A5C, #FFB347); color: #fff; border-radius: 999px; padding: 11px 18px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; box-shadow: 0 8px 20px rgba(232,90,59,0.35); z-index: 5; }
+  .join-btn.joined { background: linear-gradient(135deg, #8FA562, #B6C68A); box-shadow: 0 8px 20px rgba(124,145,82,0.3); }
+
+  .auth-screen { padding: 44px 26px 26px; flex: 1; display: flex; flex-direction: column; }
+  .auth-logo { width: 60px; height: 60px; border-radius: 20px; background: linear-gradient(135deg, #FF7A5C, #FFB347); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; box-shadow: 0 10px 24px rgba(232,90,59,0.3); }
+  .auth-logo i { font-size: 28px; color: #fff; }
+  .auth-title { text-align: center; font-size: 20px; font-weight: 700; margin: 0 0 4px; color: #3A2E28; }
+  .auth-subtitle { text-align: center; font-size: 12.5px; color: #B0998A; margin: 0 0 24px; }
+  .auth-tabs { display: flex; background: #FFF1E6; border-radius: 14px; padding: 4px; margin-bottom: 24px; }
+  .auth-tab { flex: 1; text-align: center; padding: 9px 0; font-size: 12.5px; font-weight: 600; border-radius: 10px; color: #C9A896; }
+  .auth-tab.active { background: #fff; color: #FF6B4A; box-shadow: 0 3px 8px rgba(232,90,59,0.15); }
+  .field-group { margin-bottom: 15px; }
+  .field-label { font-size: 12px; color: #7A6558; margin: 0 0 6px; display: block; font-weight: 500; }
+  .field-input { border: 1px solid #F0DFCF; background: #FFFBF7; border-radius: 12px; padding: 12px 13px; display: flex; align-items: center; gap: 8px; }
+  .field-input input { border: none; outline: none; font-size: 13px; flex: 1; font-family: inherit; background: transparent; color: #3A2E28; }
+  .field-input i { font-size: 15px; color: #D8C4B4; }
+  .primary-btn { background: linear-gradient(135deg, #FF7A5C, #FFB347); color: #fff; text-align: center; border-radius: 12px; padding: 13px 0; font-size: 13.5px; font-weight: 700; margin-top: 8px; width: 100%; box-shadow: 0 10px 24px rgba(232,90,59,0.3); }
+  .auth-switch { text-align: center; font-size: 12px; color: #B0998A; margin-top: 18px; }
+  .auth-switch b { color: #FF6B4A; font-weight: 700; }
+
+  .profile-header { background: linear-gradient(135deg, #FF7A5C 0%, #FFB347 100%); padding: 28px 18px 44px; border-radius: 0 0 28px 28px; display: flex; flex-direction: column; align-items: center; position: relative; }
+  .profile-header i.edit-icon { position: absolute; top: 20px; right: 20px; font-size: 18px; color: #fff; }
+  .profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+  .profile-avatar i { font-size: 32px; color: #FF6B4A; }
+  .profile-name { color: #fff; font-size: 17px; font-weight: 700; margin: 0 0 2px; }
+  .profile-program { color: #FFEBDD; font-size: 12px; margin: 0; }
+  .profile-body { padding: 22px 20px; margin-top: -26px; flex: 1; overflow-y: auto; }
+  .info-card { background: #fff; border: 1px solid #F5E6D8; border-radius: 18px; padding: 4px 16px; margin-bottom: 16px; box-shadow: 0 10px 24px rgba(232,90,59,0.08); }
+  .info-row { display: flex; align-items: center; gap: 12px; padding: 13px 0; }
+  .info-row + .info-row { border-top: 1px solid #F5E6D8; }
+  .info-row i { font-size: 16px; color: #FF6B4A; width: 18px; }
+  .info-row .info-text p.k { font-size: 10.5px; color: #B0998A; margin: 0; }
+  .info-row .info-text p.v { font-size: 13px; margin: 2px 0 0; color: #3A2E28; font-weight: 500; }
+  .pref-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pref-tag { background: linear-gradient(135deg, #FFE1D2, #FFE9C2); color: #E0621E; font-size: 11.5px; font-weight: 600; padding: 7px 13px; border-radius: 999px; }
+
+  .filters-row { display: flex; gap: 8px; padding: 0 20px 14px; overflow-x: auto; }
+  .filter-chip { border: 1px solid #F0DFCF; background: #fff; border-radius: 999px; padding: 7px 14px; font-size: 11.5px; color: #7A6558; flex-shrink: 0; white-space: nowrap; font-weight: 500; }
+  .filter-chip.active { background: linear-gradient(135deg, #FF7A5C, #FFB347); border-color: transparent; color: #fff; font-weight: 600; }
+  .listing-card { border: 1px solid #F5E6D8; border-radius: 18px; overflow: hidden; margin-bottom: 14px; text-align: left; width: 100%; box-shadow: 0 6px 16px rgba(232,90,59,0.06); }
+  .listing-photo { height: 96px; background: linear-gradient(135deg, #FFDCC4, #FFB98A); display: flex; align-items: center; justify-content: center; }
+  .listing-photo i { font-size: 28px; color: #fff; }
+  .listing-info { padding: 12px 14px; }
+  .listing-info .price { font-size: 14.5px; font-weight: 700; margin: 0 0 3px; color: #3A2E28; }
+  .listing-info .addr { font-size: 12px; color: #7A6558; margin: 0 0 8px; display: flex; align-items: center; gap: 4px; }
+  .listing-tags { display: flex; gap: 6px; }
+  .listing-tag { background: #FFF1E6; font-size: 10.5px; color: #C0692E; padding: 4px 9px; border-radius: 8px; font-weight: 500; }
+
+  .detail-photo { height: 180px; background: linear-gradient(135deg, #FFDCC4, #FFB98A); display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
+  .detail-photo i.house-icon { font-size: 42px; color: #fff; }
+  .back-icon { position: absolute; top: 18px; left: 18px; background: #fff; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #3A2E28; box-shadow: 0 4px 10px rgba(0,0,0,0.12); }
+  .heart-icon { position: absolute; top: 18px; right: 18px; background: #fff; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #E8593F; box-shadow: 0 4px 10px rgba(0,0,0,0.12); }
+  .heart-icon.liked { background: #FFD9CE; }
+  .detail-body { padding: 18px 20px; flex: 1; overflow-y: auto; }
+  .detail-price { font-size: 22px; font-weight: 700; margin: 0 0 3px; color: #3A2E28; }
+  .detail-addr { font-size: 12.5px; color: #7A6558; margin: 0 0 14px; display: flex; align-items: center; gap: 5px; }
+  .amenities-row { display: flex; gap: 16px; padding: 14px 0; border-top: 1px solid #F5E6D8; border-bottom: 1px solid #F5E6D8; margin-bottom: 14px; }
+  .amenity { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; }
+  .amenity i { font-size: 17px; color: #FF6B4A; }
+  .amenity span { font-size: 10.5px; color: #7A6558; }
+  .detail-desc { font-size: 12.5px; color: #7A6558; line-height: 1.6; margin: 0 0 16px; }
+  .roommate-box { display: flex; align-items: center; gap: 10px; border: 1px solid #F5E6D8; background: #FFFBF7; border-radius: 14px; padding: 11px 13px; margin-bottom: 18px; }
+  .roommate-box p.n { font-size: 12.5px; font-weight: 600; margin: 0; color: #3A2E28; }
+  .roommate-box p.m { font-size: 11px; color: #B0998A; margin: 1px 0 0; }
+  .contact-btn { background: linear-gradient(135deg, #FF7A5C, #FFB347); color: #fff; text-align: center; border-radius: 12px; padding: 13px 0; font-size: 13.5px; font-weight: 700; box-shadow: 0 10px 24px rgba(232,90,59,0.3); }
+  .contact-btn.sent { background: linear-gradient(135deg, #8FA562, #B6C68A); box-shadow: 0 10px 24px rgba(124,145,82,0.25); }
+
+  .event-card { display: flex; gap: 12px; border: 1px solid #F5E6D8; border-radius: 16px; padding: 12px; margin-bottom: 10px; text-align: left; width: 100%; box-shadow: 0 6px 16px rgba(232,90,59,0.05); position: relative; }
+  .event-date { width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #FFE1D2, #FFE9C2); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+  .event-date .day { font-size: 15px; font-weight: 700; color: #E8593F; line-height: 1; }
+  .event-date .mon { font-size: 9.5px; color: #E8593F; text-transform: uppercase; font-weight: 600; }
+  .event-card .info { flex: 1; }
+  .event-card .info p.title { font-size: 13px; font-weight: 600; margin: 0 0 3px; color: #3A2E28; }
+  .event-card .info p.meta { font-size: 11.5px; color: #B0998A; margin: 0 0 7px; display: flex; align-items: center; gap: 4px; }
+  .event-tag { background: #FFF1E6; font-size: 10.5px; color: #C0692E; padding: 4px 9px; border-radius: 8px; font-weight: 500; }
+
+  .event-detail-banner { height: 150px; background: linear-gradient(135deg, #FFDCC4, #FFB98A); display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
+  .event-detail-banner i.calendar-icon { font-size: 38px; color: #fff; }
+  .event-detail-body { padding: 20px; flex: 1; overflow-y: auto; }
+  .event-cat { display: inline-block; background: linear-gradient(135deg, #FFE1D2, #FFE9C2); color: #E0621E; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 999px; margin-bottom: 12px; }
+  .event-detail-title { font-size: 19px; font-weight: 700; margin: 0 0 14px; color: #3A2E28; }
+  .event-meta-row { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; }
+  .event-meta-row i { font-size: 16px; color: #FF6B4A; width: 18px; }
+  .event-meta-row .k { font-size: 10.5px; color: #B0998A; margin: 0; }
+  .event-meta-row .v { font-size: 13px; margin: 1px 0 0; color: #3A2E28; font-weight: 500; }
+  .attendees-row { display: flex; align-items: center; gap: 8px; margin: 16px 0; }
+  .attendees-row .stack { display: flex; }
+  .attendees-row .stack .av { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; margin-left: -8px; display: flex; align-items: center; justify-content: center; }
+  .attendees-row .stack .av:first-child { margin-left: 0; }
+  .attendees-row span { font-size: 12px; color: #7A6558; }
+  .rsvp-btn { background: linear-gradient(135deg, #FF7A5C, #FFB347); color: #fff; text-align: center; border-radius: 12px; padding: 13px 0; font-size: 13.5px; font-weight: 700; margin-top: 8px; box-shadow: 0 10px 24px rgba(232,90,59,0.3); }
+  .rsvp-btn.going { background: linear-gradient(135deg, #8FA562, #B6C68A); box-shadow: 0 10px 24px rgba(124,145,82,0.25); }
+  .caption { text-align: center; font-size: 12px; color: #B0998A; margin: 0; font-weight: 500; }
+  .top-bar { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
+  .lang-toggle { border: none; color: #fff; background: linear-gradient(135deg, #FF7A5C, #FFB347); border-radius: 999px; padding: 6px 16px; font-size: 12px; font-weight: 700; box-shadow: 0 6px 16px rgba(232,90,59,0.3); }
+  .lang-toggle:active { transform: scale(0.96); }
+
+  /* NOUVEAU : formulaire d'inscription enrichi */
+  .lang-pref-row { display: flex; gap: 8px; }
+  .lang-pref-btn { flex: 1; text-align: center; padding: 10px 0; border: 1px solid #F0DFCF; border-radius: 12px; font-size: 12.5px; font-weight: 600; color: #B0998A; background: #FFFBF7; }
+  .lang-pref-btn.selected { background: linear-gradient(135deg, #FF7A5C, #FFB347); border-color: transparent; color: #fff; }
+  .form-error { background: #FFEAE4; border: 1px solid #FFC5B3; color: #C1442A; font-size: 12px; border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; line-height: 1.5; }
+  .form-error ul { margin: 4px 0 0; padding-left: 18px; }
+  .success-box { text-align: center; padding: 30px 10px; }
+  .success-icon { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #8FA562, #B6C68A); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .success-icon i { font-size: 30px; color: #fff; }
+  .success-title { font-size: 17px; font-weight: 700; color: #3A2E28; margin: 0 0 8px; }
+  .success-message { font-size: 12.5px; color: #7A6558; margin: 0 0 24px; line-height: 1.5; }
+
+  /* NOUVEAU : page Cours et horaire */
+  .course-card .info p.meta { margin-bottom: 2px; }
+  .schedule-row { display: flex; align-items: center; padding: 13px 0; border-bottom: 1px solid #F5E6D8; gap: 10px; }
+  .schedule-row:last-child { border-bottom: none; }
+  .schedule-day { font-size: 12.5px; font-weight: 700; color: #3A2E28; width: 74px; flex-shrink: 0; }
+  .schedule-course { font-size: 12px; color: #7A6558; text-align: right; flex: 1; }
+  .schedule-course.muted { color: #D8C4B4; font-style: italic; }
+  .course-card { cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; }
+  .course-card:hover { box-shadow: 0 8px 20px rgba(232,90,59,0.15); }
+  .course-card:active { transform: scale(0.98); background: #FFF1E6; }
+
+  /* NOUVEAU : édition du profil et déconnexion */
+  .secondary-btn { background: #fff; color: #FF6B4A; border: 1px solid #FF6B4A; text-align: center; border-radius: 12px; padding: 12px 0; font-size: 13.5px; font-weight: 700; width: 100%; }
+  .logout-btn { background: #fff; color: #E8593F; border: 1px solid #FFD9CE; text-align: center; border-radius: 12px; padding: 12px 0; font-size: 13.5px; font-weight: 700; width: 100%; margin-top: 18px; }
+  .confirm-box { background: #FFF1E6; border: 1px solid #FFD9CE; border-radius: 18px; padding: 22px 18px; text-align: center; margin-top: 18px; }
+  .confirm-title { font-size: 13.5px; font-weight: 600; color: #3A2E28; margin: 0 0 16px; line-height: 1.5; }
+  .confirm-actions { display: flex; flex-direction: column; gap: 10px; }
+
+  /* NOUVEAU : recherche et filtres Logements */
+  .housing-search-bar { display: flex; align-items: center; gap: 8px; background: #FFFBF7; border: 1px solid #F0DFCF; border-radius: 14px; padding: 11px 14px; margin: 0 20px 14px; }
+  .housing-search-bar i.search-icon { font-size: 16px; color: #C9A896; }
+  .housing-search-bar input { border: none; outline: none; background: transparent; font-size: 13px; flex: 1; font-family: inherit; color: #3A2E28; }
+  .housing-search-bar input::placeholder { color: #C9A896; }
+  .clear-search-btn { font-size: 11px; color: #B0998A; font-weight: 600; background: none; border: none; cursor: pointer; flex-shrink: 0; }
+  .filter-select { width: 100%; border: 1px solid #F0DFCF; background: #FFFBF7; border-radius: 12px; padding: 9px 10px; font-size: 12px; color: #3A2E28; font-family: inherit; }
+  .housing-results-count { font-size: 12px; color: #7A6558; font-weight: 600; margin: 12px 0 4px; }
+  .listing-photo, .event-card-photo { position: relative; }
+  .card-heart-btn { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #B0998A; box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+  .card-heart-btn.liked { color: #E8593F; background: #fff; }
+
+  /* NOUVEAU : Communauté interactive */
+  .create-post-box { border: 1px solid #F5E6D8; background: #FFFBF7; border-radius: 16px; padding: 12px; margin-bottom: 16px; }
+  .create-post-box textarea { width: 100%; border: 1px solid #F0DFCF; border-radius: 12px; padding: 10px 12px; font-size: 13px; font-family: inherit; resize: none; background: #fff; color: #3A2E28; }
+  .create-post-box .publish-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+  .publish-btn { background: linear-gradient(135deg, #FF7A5C, #FFB347); color: #fff; border: none; border-radius: 10px; padding: 8px 18px; font-size: 12.5px; font-weight: 700; }
+  .post-actions span { cursor: pointer; }
+  .post-actions span.liked { color: #E8593F; font-weight: 700; }
+  .comment-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid #F5E6D8; }
+  .comment-item { font-size: 12px; color: #7A6558; margin: 0 0 6px; }
+  .comment-input-row { display: flex; gap: 8px; margin-top: 6px; }
+  .comment-input-row input { flex: 1; border: 1px solid #F0DFCF; border-radius: 999px; padding: 7px 12px; font-size: 12px; font-family: inherit; background: #fff; color: #3A2E28; }
+  .comment-input-row button { background: #FF6B4A; color: #fff; border: none; border-radius: 999px; padding: 7px 14px; font-size: 11.5px; font-weight: 600; }
+
+  /* NOUVEAU : Notifications */
+  .notif-bell-wrap { position: relative; display: inline-flex; cursor: pointer; }
+  .notif-badge { position: absolute; top: -6px; right: -8px; background: #fff; color: #E8593F; font-size: 10px; font-weight: 700; border-radius: 999px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
+  .notif-item { display: flex; align-items: center; gap: 12px; border: 1px solid #F5E6D8; background: #FFFBF7; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; cursor: pointer; }
+  .notif-item.read { opacity: 0.5; }
+  .notif-icon { width: 36px; height: 36px; border-radius: 10px; background: #FFE1D2; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .notif-icon i { color: #FF6B4A; font-size: 16px; }
+  .notif-text { flex: 1; font-size: 12.5px; color: #3A2E28; line-height: 1.4; }
+  .notif-delete { font-size: 17px; color: #D8C4B4; cursor: pointer; flex-shrink: 0; }
+  .notif-item { transition: transform 0.12s; }
+  .notif-item:active { transform: scale(0.98); }
+  .post.post-highlight { border-color: #FF6B4A; box-shadow: 0 0 0 3px rgba(255,107,74,0.25); }
+
+  /* NOUVEAU : Tableau de bord Accueil */
+  .dashboard-greeting { font-size: 16px; font-weight: 700; color: #3A2E28; margin: 4px 0 14px; }
+  .dash-card { border: 1px solid #F5E6D8; background: #FFFBF7; border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; cursor: pointer; }
+  .dash-card-label { font-size: 11.5px; color: #B0998A; font-weight: 600; margin: 0 0 6px; }
+  .dash-card-title { font-size: 13.5px; font-weight: 600; color: #3A2E28; margin: 0 0 2px; }
+  .dash-card-sub { font-size: 11.5px; color: #7A6558; margin: 0; }
+  .dash-mini-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #3A2E28; padding: 5px 0; }
+  .dash-mini-row + .dash-mini-row { border-top: 1px solid #F0DFCF; }
+  .dash-mini-price { font-weight: 600; color: #FF6B4A; font-size: 11.5px; }
+  .dash-stats-row { display: flex; gap: 10px; margin-bottom: 14px; }
+  .dash-stat { flex: 1; border: 1px solid #F5E6D8; background: #FFFBF7; border-radius: 14px; padding: 12px; text-align: center; cursor: pointer; }
+  .dash-stat-num { font-size: 20px; font-weight: 700; color: #FF6B4A; margin: 0 0 2px; }
+  .dash-stat-label { font-size: 10.5px; color: #7A6558; margin: 0; }
+  .dash-quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 6px; }
+  .dash-quick-btn { border: 1px solid #F5E6D8; background: #fff; border-radius: 12px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .dash-quick-btn i { font-size: 17px; color: #FF6B4A; }
+  .dash-quick-btn span { font-size: 9.5px; color: #3A2E28; font-weight: 500; text-align: center; }
+</style>
+</head>
+<body>
+
+<div style="display:flex; flex-direction:column; align-items:center;">
+<div class="top-bar">
+  <p class="caption" data-i18n="caption">Prototype interactif StudLife — clique sur les boutons !</p>
+  <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">EN</button>
+</div>
+<div class="phone">
+
+  <!-- PAGE : CONNEXION / INSCRIPTION -->
+  <div class="page active" id="page-auth">
+    <div class="auth-screen" id="authScreen" style="overflow-y:auto;">
+      <div class="auth-logo"><i class="ti ti-school"></i></div>
+      <p class="auth-title">StudLife</p>
+      <p class="auth-subtitle" data-i18n="auth_subtitle">Trouve ton logement et ta communauté étudiante</p>
+      <div class="auth-tabs" id="authTabs">
+        <div class="auth-tab" id="authTabLogin" onclick="switchAuthTab('login')" data-i18n="auth_tab_login">Connexion</div>
+        <div class="auth-tab active" id="authTabSignup" onclick="switchAuthTab('signup')" data-i18n="auth_tab_signup">Inscription</div>
+      </div>
+
+      <div id="loginError" class="form-error" style="display:none;"></div>
+      <div id="signupError" class="form-error" style="display:none;"></div>
+      <div id="forgotError" class="form-error" style="display:none;"></div>
+
+      <div id="loginFields" style="display:none;">
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_email_label">Adresse courriel</span>
+          <div class="field-input"><i class="ti ti-mail"></i><input type="text" id="loginEmailInput" placeholder="prenom.nom@courriel.uqam.ca"></div>
+        </div>
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_password_label">Mot de passe</span>
+          <div class="field-input"><i class="ti ti-lock"></i><input type="password" id="loginPasswordInput" placeholder="••••••••"></div>
+        </div>
+        <button class="primary-btn" data-i18n="login_submit" onclick="validateLogin()">Se connecter</button>
+        <p class="auth-switch"><span data-i18n="login_no_account_plain">Pas de compte ? </span><b onclick="switchAuthTab('signup')" style="cursor:pointer;" data-i18n="link_create_account">Créer un compte</b></p>
+        <p class="auth-switch" style="margin-top:6px;"><b onclick="showForgotView()" style="cursor:pointer; color:#B0998A;" data-i18n="link_forgot_password">Mot de passe oublié ?</b></p>
+      </div>
+
+      <div id="forgotFields" style="display:none;">
+        <p class="auth-subtitle" style="margin-bottom:20px;" data-i18n="forgot_intro">Entre ton adresse courriel, on te dirait comment réinitialiser ton mot de passe (simulation).</p>
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_email_label">Adresse courriel</span>
+          <div class="field-input"><i class="ti ti-mail"></i><input type="text" id="forgotEmailInput" placeholder="prenom.nom@courriel.uqam.ca"></div>
+        </div>
+        <button class="primary-btn" data-i18n="forgot_submit" onclick="validateForgotPassword()">Envoyer</button>
+        <p class="auth-switch"><b onclick="backToLogin()" style="cursor:pointer;" data-i18n="back_to_login">← Retour à la connexion</b></p>
+      </div>
+
+      <div id="signupFields">
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_fullname_label">Nom complet</span>
+          <div class="field-input"><i class="ti ti-user"></i><input type="text" id="fullNameInput" placeholder="Camille Tremblay"></div>
+        </div>
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_email_label">Adresse courriel</span>
+          <div class="field-input"><i class="ti ti-mail"></i><input type="text" id="emailInput" placeholder="prenom.nom@courriel.uqam.ca"></div>
+        </div>
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_school_label">Établissement scolaire</span>
+          <div class="field-input"><i class="ti ti-building"></i><input type="text" id="schoolInput" placeholder="UQAM"></div>
+        </div>
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_program_label">Programme d'études</span>
+          <div class="field-input"><i class="ti ti-book"></i><input type="text" id="programInput" placeholder="Génie logiciel"></div>
+        </div>
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_lang_pref_label">Langue préférée</span>
+          <div class="lang-pref-row">
+            <button type="button" class="lang-pref-btn selected" id="prefLangFrBtn" onclick="selectPrefLang('fr')" data-i18n="lang_pref_fr">Français</button>
+            <button type="button" class="lang-pref-btn" id="prefLangEnBtn" onclick="selectPrefLang('en')" data-i18n="lang_pref_en">English</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_password_label">Mot de passe</span>
+          <div class="field-input"><i class="ti ti-lock"></i><input type="password" id="passwordInput" placeholder="••••••••"></div>
+        </div>
+        <button class="primary-btn" data-i18n="auth_submit" onclick="validateSignup()">Créer mon compte</button>
+        <p class="auth-switch"><span data-i18n="auth_switch_plain">Déjà un compte ? </span><b onclick="switchAuthTab('login')" style="cursor:pointer;" data-i18n="auth_switch_bold">Se connecter</b></p>
+      </div>
+
+      <div id="loginSuccess" class="success-box" style="display:none;">
+        <div class="success-icon"><i class="ti ti-check"></i></div>
+        <p class="success-title" data-i18n="login_success_title">Connexion réussie (simulation)</p>
+        <p class="success-message" data-i18n="login_success_message">Ceci est une simulation : aucune vérification réelle de compte n'est faite pour le moment.</p>
+        <button class="primary-btn" data-i18n="continue_btn" onclick="showPage('accueil')">Continuer vers l'accueil</button>
+      </div>
+
+      <div id="forgotSuccess" class="success-box" style="display:none;">
+        <div class="success-icon"><i class="ti ti-mail"></i></div>
+        <p class="success-title" data-i18n="forgot_success_title">Lien envoyé (simulation)</p>
+        <p class="success-message" data-i18n="forgot_success_message">Si un compte existait avec cette adresse, un lien de réinitialisation lui serait envoyé. Aucun email n'a réellement été envoyé.</p>
+        <button class="primary-btn" data-i18n="back_to_login" onclick="backToLogin()">← Retour à la connexion</button>
+      </div>
+
+      <div id="signupSuccess" class="success-box" style="display:none;">
+        <div class="success-icon"><i class="ti ti-check"></i></div>
+        <p class="success-title" data-i18n="success_title">Compte créé avec succès !</p>
+        <p class="success-message" data-i18n="success_message">Bienvenue sur StudLife. Tu peux maintenant explorer l'application.</p>
+        <button class="primary-btn" data-i18n="continue_btn" onclick="completeSignup()">Continuer vers l'accueil</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE : ACCUEIL -->
+  <div class="page" id="page-accueil">
+    <div class="home-header">
+      <div class="top-row"><span>StudLife</span><span class="notif-bell-wrap" onclick="showPage('notifications')" style="font-size:19px;">🔔<span class="notif-badge" id="notifBadgeHome" style="display:none;">0</span></span></div>
+      <div class="search-bar">
+        <i class="ti ti-search search-icon"></i>
+        <span data-i18n="home_search_placeholder">Que cherches-tu aujourd'hui ?</span>
+        <div class="search-btn"><i class="ti ti-arrow-right"></i></div>
+      </div>
+    </div>
+    <div class="content" style="padding-bottom:70px;">
+      <p class="dashboard-greeting">👋 <span data-i18n="greeting_hello">Bonjour</span>, <span id="dashboardName">Anta</span> !</p>
+
+      <div class="dash-card" onclick="showPage('cours')">
+        <p class="dash-card-label">📚 <span data-i18n="dash_next_course">Prochain cours</span></p>
+        <p class="dash-card-title" data-i18n="course1_name">Réseautique</p>
+        <p class="dash-card-sub"><span data-i18n="course1_day">Mardi</span> · <span data-i18n="course1_time">9 h à 11 h</span></p>
+      </div>
+
+      <div class="dash-card" onclick="showPage('logements')">
+        <p class="dash-card-label">🏠 <span data-i18n="dash_recent_housing">Logements récents</span></p>
+        <div id="dashHousingMini"></div>
+      </div>
+
+      <div class="dash-card" onclick="showPage('evenements')">
+        <p class="dash-card-label">🎉 <span data-i18n="dash_upcoming_events">Prochains événements</span></p>
+        <div id="dashEventsMini"></div>
+      </div>
+
+      <div class="dash-stats-row">
+        <div class="dash-stat" onclick="showPage('favoris')">
+          <p class="dash-stat-num" id="dashFavCount">0</p>
+          <p class="dash-stat-label">❤️ <span data-i18n="favorites_title">Mes favoris</span></p>
+        </div>
+        <div class="dash-stat" onclick="showPage('notifications')">
+          <p class="dash-stat-num" id="dashNotifCount">0</p>
+          <p class="dash-stat-label">🔔 <span data-i18n="notifications_title">Notifications</span></p>
+        </div>
+      </div>
+
+      <p class="label" data-i18n="dash_quick_access">Accès rapide</p>
+      <div class="dash-quick-grid">
+        <button class="dash-quick-btn" onclick="showPage('cours')"><i class="ti ti-book"></i><span data-i18n="dash_my_courses">Mes cours</span></button>
+        <button class="dash-quick-btn" onclick="showPage('logements')"><i class="ti ti-home"></i><span data-i18n="housing_title">Logements</span></button>
+        <button class="dash-quick-btn" onclick="showPage('favoris')"><i class="ti ti-heart"></i><span data-i18n="favorites_title">Mes favoris</span></button>
+        <button class="dash-quick-btn" onclick="showPage('evenements')"><i class="ti ti-calendar"></i><span data-i18n="nav_events">Événements</span></button>
+        <button class="dash-quick-btn" onclick="showPage('notifications')"><i class="ti ti-bell"></i><span data-i18n="notifications_title">Notifications</span></button>
+        <button class="dash-quick-btn" onclick="showPage('communaute')"><i class="ti ti-users"></i><span data-i18n="nav_community">Communauté</span></button>
+      </div>
+    </div>
+    <div class="navbar">
+      <button class="nav-item active" data-nav="accueil" onclick="showPage('accueil')"><i class="ti ti-home"></i><span data-i18n="nav_home">Accueil</span></button>
+      <button class="nav-item" data-nav="communaute" onclick="showPage('communaute')"><i class="ti ti-users"></i><span data-i18n="nav_community">Communauté</span></button>
+      <button class="nav-item" data-nav="evenements" onclick="showPage('evenements')"><i class="ti ti-calendar"></i><span data-i18n="nav_events">Événements</span></button>
+      <button class="nav-item" data-nav="profil" onclick="showPage('profil')"><i class="ti ti-user"></i><span data-i18n="nav_profile">Profil</span></button>
+    </div>
+  </div>
+
+  <!-- PAGE : COMMUNAUTE -->
+  <div class="page" id="page-communaute">
+    <div class="comm-header"><span data-i18n="nav_community">Communauté</span><i class="ti ti-search"></i></div>
+    <div class="groups-row">
+      <div class="group-card" onclick="showGroupDetail('genie')"><div class="icon-box bg-blue" style="margin-bottom:8px;"><i class="ti ti-code text-blue"></i></div><p class="title" data-i18n="group1_title">Génie logiciel</p><p class="members" data-i18n="group1_members">128 membres</p></div>
+      <div class="group-card" onclick="showGroupDetail('stats')"><div class="icon-box bg-green" style="margin-bottom:8px;"><i class="ti ti-chart-bar text-green"></i></div><p class="title" data-i18n="group2_title">Statistiques</p><p class="members" data-i18n="group2_members">64 membres</p></div>
+      <div class="group-card" onclick="showGroupDetail('sport')"><div class="icon-box bg-orange" style="margin-bottom:8px;"><i class="ti ti-ball-basketball text-orange"></i></div><p class="title" data-i18n="group3_title">Sport campus</p><p class="members" data-i18n="group3_members">95 membres</p></div>
+    </div>
+    <div class="content" style="padding-top:4px; padding-bottom:70px;">
+      <div class="create-post-box">
+        <textarea id="newPostInput" rows="2" placeholder="Exprime-toi..." data-i18n-placeholder="create_post_placeholder"></textarea>
+        <div class="publish-row">
+          <button class="publish-btn" onclick="publishPost()" data-i18n="publish_btn">Publier</button>
+        </div>
+      </div>
+
+      <p class="label" data-i18n="posts_label">Publications récentes</p>
+      <div class="posts" id="postsContainer"></div>
+    </div>
+    <button class="join-btn" id="joinBtn" onclick="joinGroup()"><i class="ti ti-plus"></i><span id="joinBtnText" data-i18n="join_btn">Rejoindre un groupe</span></button>
+    <div class="navbar">
+      <button class="nav-item" data-nav="accueil" onclick="showPage('accueil')"><i class="ti ti-home"></i><span data-i18n="nav_home">Accueil</span></button>
+      <button class="nav-item active" data-nav="communaute" onclick="showPage('communaute')"><i class="ti ti-users"></i><span data-i18n="nav_community">Communauté</span></button>
+      <button class="nav-item" data-nav="evenements" onclick="showPage('evenements')"><i class="ti ti-calendar"></i><span data-i18n="nav_events">Événements</span></button>
+      <button class="nav-item" data-nav="profil" onclick="showPage('profil')"><i class="ti ti-user"></i><span data-i18n="nav_profile">Profil</span></button>
+    </div>
+  </div>
+
+  <!-- PAGE : DETAIL D'UN GROUPE COMMUNAUTAIRE -->
+  <div class="page" id="page-group-detail">
+    <div class="comm-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span onclick="goBack()" style="cursor:pointer; font-size:22px; font-weight:700; color:#5f5e5a; line-height:1; padding:2px 4px;">&#8592;</span>
+        <span id="groupDetailName">Génie logiciel</span>
+      </div>
+    </div>
+    <p class="label" style="padding:0 20px; margin:0 0 12px;" id="groupDetailMembers">128 membres</p>
+
+    <div class="content" style="padding-top:0; padding-bottom:70px;">
+      <div class="create-post-box">
+        <textarea id="groupNewPostInput" rows="2" placeholder="Exprime-toi..." data-i18n-placeholder="create_post_placeholder"></textarea>
+        <div class="publish-row">
+          <button class="publish-btn" onclick="publishGroupPost()" data-i18n="publish_btn">Publier</button>
+        </div>
+      </div>
+      <p id="groupNoPostsMsg" class="detail-desc" style="text-align:center; display:none; padding:12px 0;" data-i18n="group_no_posts">Aucune publication dans ce groupe pour le moment.</p>
+      <div id="groupPostsContainer"></div>
+    </div>
+  </div>
+
+  <!-- PAGE : PROFIL -->
+  <div class="page" id="page-profil">
+    <div class="profile-header">
+      <i class="ti ti-pencil edit-icon" style="cursor:pointer;" onclick="showProfileEdit()"></i>
+      <div class="profile-avatar"><i class="ti ti-user"></i></div>
+      <p class="profile-name" id="profileHeaderName">Anta Top</p>
+      <p class="profile-program" id="profileHeaderSub">Soutien technique en informatique · Collège Boréal</p>
+    </div>
+    <div class="profile-body">
+
+      <!-- Vue affichage -->
+      <div id="profileDisplayView">
+        <div class="info-card">
+          <div class="info-row"><i class="ti ti-user"></i><div class="info-text"><p class="k" data-i18n="field_name_label">Nom</p><p class="v" id="profileViewName">Anta Top</p></div></div>
+          <div class="info-row"><i class="ti ti-building"></i><div class="info-text"><p class="k" data-i18n="field_school_short_label">École</p><p class="v" id="profileViewSchool">Collège Boréal</p></div></div>
+          <div class="info-row"><i class="ti ti-book"></i><div class="info-text"><p class="k" data-i18n="field_program_short_label">Programme</p><p class="v" id="profileViewProgram">Soutien technique en informatique</p></div></div>
+          <div class="info-row"><i class="ti ti-map-pin"></i><div class="info-text"><p class="k" data-i18n="field_city_label">Ville</p><p class="v" id="profileViewCity">Toronto</p></div></div>
+          <div class="info-row"><i class="ti ti-language"></i><div class="info-text"><p class="k" data-i18n="field_language_label">Langue</p><p class="v" id="profileViewLanguage">Français</p></div></div>
+        </div>
+
+        <button class="primary-btn" onclick="showProfileEdit()">✏️ <span data-i18n="edit_profile_btn_text">Modifier mon profil</span></button>
+        <button class="logout-btn" onclick="showLogoutConfirm()">🚪 <span data-i18n="logout_btn_text">Se déconnecter</span></button>
+      </div>
+
+      <!-- Vue édition -->
+      <div id="profileEditView" style="display:none;">
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_name_label">Nom</span>
+          <div class="field-input"><i class="ti ti-user"></i><input type="text" id="editNameInput"></div>
+        </div>
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_school_short_label">École</span>
+          <div class="field-input"><i class="ti ti-building"></i><input type="text" id="editSchoolInput"></div>
+        </div>
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_program_short_label">Programme</span>
+          <div class="field-input"><i class="ti ti-book"></i><input type="text" id="editProgramInput"></div>
+        </div>
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_city_label">Ville</span>
+          <div class="field-input"><i class="ti ti-map-pin"></i><input type="text" id="editCityInput"></div>
+        </div>
+        <div class="field-group">
+          <span class="field-label" data-i18n="field_language_label">Langue</span>
+          <div class="lang-pref-row">
+            <button type="button" class="lang-pref-btn" id="editLangFrBtn" onclick="selectProfileLang('fr')" data-i18n="lang_pref_fr">Français</button>
+            <button type="button" class="lang-pref-btn" id="editLangEnBtn" onclick="selectProfileLang('en')" data-i18n="lang_pref_en">English</button>
+          </div>
+        </div>
+        <button class="primary-btn" data-i18n="save_btn" onclick="saveProfile()">Enregistrer</button>
+        <button class="secondary-btn" style="margin-top:10px;" data-i18n="cancel_btn" onclick="cancelProfileEdit()">Annuler</button>
+      </div>
+
+      <!-- Vue confirmation de déconnexion -->
+      <div id="profileLogoutView" style="display:none;">
+        <div class="confirm-box">
+          <p class="confirm-title" data-i18n="logout_confirm_title">Voulez-vous vraiment vous déconnecter ?</p>
+          <div class="confirm-actions">
+            <button class="logout-btn" style="margin-top:0;" data-i18n="logout_confirm_yes" onclick="confirmLogout()">Oui, me déconnecter</button>
+            <button class="secondary-btn" data-i18n="cancel_btn" onclick="cancelLogout()">Annuler</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="navbar">
+      <button class="nav-item" data-nav="accueil" onclick="showPage('accueil')"><i class="ti ti-home"></i><span data-i18n="nav_home">Accueil</span></button>
+      <button class="nav-item" data-nav="communaute" onclick="showPage('communaute')"><i class="ti ti-users"></i><span data-i18n="nav_community">Communauté</span></button>
+      <button class="nav-item" data-nav="evenements" onclick="showPage('evenements')"><i class="ti ti-calendar"></i><span data-i18n="nav_events">Événements</span></button>
+      <button class="nav-item active" data-nav="profil" onclick="showPage('profil')"><i class="ti ti-user"></i><span data-i18n="nav_profile">Profil</span></button>
+    </div>
+  </div>
+
+  <!-- PAGE : MES FAVORIS (logements) -->
+  <div class="page" id="page-favoris">
+    <div class="comm-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span onclick="goBack()" style="cursor:pointer; font-size:22px; font-weight:700; color:#5f5e5a; line-height:1; padding:2px 4px;">&#8592;</span>
+        <span data-i18n="favorites_title">Mes favoris</span>
+      </div>
+    </div>
+    <div class="content" style="padding-top:4px;">
+      <p class="label" data-i18n="housing_title">Logements</p>
+      <p id="favoritesEmptyMsg" class="detail-desc" style="text-align:center; display:none; padding:8px 0 16px;" data-i18n="no_favorites_housing">Vous n'avez aucun logement favori.</p>
+      <div id="favoritesListContainer"></div>
+
+      <p class="label" style="margin-top:14px;" data-i18n="nav_events">Événements</p>
+      <p id="favoritesEventsEmptyMsg" class="detail-desc" style="text-align:center; display:none; padding:8px 0 16px;" data-i18n="no_favorites_events">Vous n'avez aucun événement favori.</p>
+      <div id="favoritesEventsListContainer"></div>
+    </div>
+  </div>
+
+  <!-- PAGE : LOGEMENTS (liste) -->
+  <div class="page" id="page-logements">
+    <div class="comm-header"><span data-i18n="housing_title">Logements</span>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <i class="ti ti-heart" style="cursor:pointer;" onclick="showPage('favoris')"></i>
+        <i class="ti ti-adjustments-horizontal"></i>
+      </div>
+    </div>
+
+    <div class="housing-search-bar">
+      <i class="ti ti-search search-icon"></i>
+      <input type="text" id="housingSearchInput" oninput="renderHousingList()" placeholder="Rechercher un logement, un quartier..." data-i18n-placeholder="housing_search_placeholder">
+      <button class="clear-search-btn" onclick="clearHousingSearch()" data-i18n="clear_btn">Effacer</button>
+    </div>
+
+    <div style="padding:0 20px 6px;">
+      <p class="label" style="margin:0 0 10px;" data-i18n="filters_label">Filtres</p>
+
+      <span class="field-label" data-i18n="housing_type_label">Type de logement</span>
+      <div class="filters-row" id="housingTypeFilters" style="padding:0 0 12px;">
+        <div class="filter-chip active" data-type="all" onclick="setHousingType('all')" data-i18n="type_all">Tous</div>
+        <div class="filter-chip" data-type="studio" onclick="setHousingType('studio')" data-i18n="type_studio">Studio</div>
+        <div class="filter-chip" data-type="apartment" onclick="setHousingType('apartment')" data-i18n="type_apartment">Appartement</div>
+        <div class="filter-chip" data-type="room" onclick="setHousingType('room')" data-i18n="type_room">Chambre</div>
+        <div class="filter-chip" data-type="colocation" onclick="setHousingType('colocation')" data-i18n="type_coloc">Colocation</div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-bottom:12px;">
+        <div style="flex:1;">
+          <span class="field-label" data-i18n="max_price_label">Prix maximum</span>
+          <select id="housingPriceSelect" class="filter-select" onchange="renderHousingList()">
+            <option value="none" data-i18n="no_max_price">Aucun maximum</option>
+            <option value="800">800 $</option>
+            <option value="1000">1000 $</option>
+            <option value="1200">1200 $</option>
+            <option value="1400">1400 $</option>
+            <option value="1600">1600 $</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <span class="field-label" data-i18n="neighborhood_label">Quartier</span>
+          <select id="housingNeighborhoodSelect" class="filter-select" onchange="renderHousingList()"></select>
+        </div>
+      </div>
+
+      <button class="secondary-btn" onclick="resetHousingFilters()" data-i18n="reset_filters_btn">Réinitialiser les filtres</button>
+      <p class="housing-results-count" id="housingResultsCount">2 logements trouvés</p>
+    </div>
+
+    <div class="content" style="padding-top:0; padding-bottom:70px;">
+      <p id="housingNoResults" class="detail-desc" style="text-align:center; display:none; padding:16px 0;" data-i18n="no_housing_found">Aucun logement trouvé.</p>
+      <div id="housingListContainer"></div>
+    </div>
+
+    <div class="navbar">
+      <button class="nav-item" data-nav="accueil" onclick="showPage('accueil')"><i class="ti ti-home"></i><span data-i18n="nav_home">Accueil</span></button>
+      <button class="nav-item" data-nav="communaute" onclick="showPage('communaute')"><i class="ti ti-users"></i><span data-i18n="nav_community">Communauté</span></button>
+      <button class="nav-item" data-nav="evenements" onclick="showPage('evenements')"><i class="ti ti-calendar"></i><span data-i18n="nav_events">Événements</span></button>
+      <button class="nav-item" data-nav="profil" onclick="showPage('profil')"><i class="ti ti-user"></i><span data-i18n="nav_profile">Profil</span></button>
+    </div>
+  </div>
+
+  <!-- PAGE : DETAIL LOGEMENT -->
+  <div class="page" id="page-logement-detail">
+    <div class="detail-photo">
+      <button class="back-icon" onclick="goBack()" style="font-size:18px; font-weight:700;">&#8592;</button>
+      <button class="heart-icon" id="heartBtn" onclick="toggleHeart()"><i class="ti ti-heart"></i></button>
+      <i class="ti ti-home house-icon"></i>
+    </div>
+    <div class="detail-body">
+      <p class="detail-price" id="dPrice">650 $ / mois</p>
+      <p class="detail-addr"><i class="ti ti-map-pin"></i><span id="dAddr">Studio · 12 min de marche de l'UdeM</span></p>
+      <div class="amenities-row">
+        <div class="amenity"><i class="ti ti-ruler-2"></i><span id="dSize">28 m²</span></div>
+        <div class="amenity"><i class="ti ti-bed"></i><span id="dRooms">1 chambre</span></div>
+        <div class="amenity"><i class="ti ti-wifi"></i><span data-i18n="amenity_wifi">Wifi incl.</span></div>
+        <div class="amenity"><i class="ti ti-parking"></i><span data-i18n="amenity_parking">Stationnement</span></div>
+      </div>
+      <p class="label" data-i18n="label_description">Description</p>
+      <p class="detail-desc" id="dDesc">Studio lumineux et rénové, à distance de marche du campus. Idéal pour un étudiant, épicerie et transport en commun à proximité.</p>
+      <p class="label" data-i18n="label_roommate">Colocataire potentiel</p>
+      <div class="roommate-box">
+        <div class="avatar bg-blue" style="width:32px;height:32px;"><i class="ti ti-user text-blue"></i></div>
+        <div><p class="n" id="dRoommateName">Alex, 21 ans</p><p class="m" id="dRoommateInfo">Génie logiciel · Non-fumeur</p></div>
+      </div>
+      <button class="contact-btn" id="contactBtn" onclick="contactOwner()">Contacter le propriétaire</button>
+    </div>
+  </div>
+
+  <!-- PAGE : EVENEMENTS (liste) -->
+  <div class="page" id="page-evenements">
+    <div class="comm-header"><span data-i18n="nav_events">Événements</span>
+      <i class="ti ti-heart" style="cursor:pointer;" onclick="showPage('mesevenements')"></i>
+    </div>
+    <div class="filters-row" id="eventsCategoryFilters">
+      <div class="filter-chip active" data-cat="all" onclick="setEventCategoryFilter('all')" data-i18n="filter_all">Tous</div>
+      <div class="filter-chip" data-cat="program" onclick="setEventCategoryFilter('program')" data-i18n="filter_program">Mon programme</div>
+      <div class="filter-chip" data-cat="sport" onclick="setEventCategoryFilter('sport')" data-i18n="filter_sport">Sportif</div>
+    </div>
+    <div class="content" style="padding-top:0; padding-bottom:70px;">
+      <div id="eventsListContainer"></div>
+    </div>
+    <div class="navbar">
+      <button class="nav-item" data-nav="accueil" onclick="showPage('accueil')"><i class="ti ti-home"></i><span data-i18n="nav_home">Accueil</span></button>
+      <button class="nav-item" data-nav="communaute" onclick="showPage('communaute')"><i class="ti ti-users"></i><span data-i18n="nav_community">Communauté</span></button>
+      <button class="nav-item active" data-nav="evenements" onclick="showPage('evenements')"><i class="ti ti-calendar"></i><span data-i18n="nav_events">Événements</span></button>
+      <button class="nav-item" data-nav="profil" onclick="showPage('profil')"><i class="ti ti-user"></i><span data-i18n="nav_profile">Profil</span></button>
+    </div>
+  </div>
+
+  <!-- PAGE : MES EVENEMENTS (participation) -->
+  <div class="page" id="page-mesevenements">
+    <div class="comm-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span onclick="goBack()" style="cursor:pointer; font-size:22px; font-weight:700; color:#5f5e5a; line-height:1; padding:2px 4px;">&#8592;</span>
+        <span data-i18n="my_events_title">Mes événements</span>
+      </div>
+    </div>
+    <div class="content" style="padding-top:4px;">
+      <p id="myEventsEmptyMsg" class="detail-desc" style="text-align:center; display:none; padding:16px 0;" data-i18n="no_my_events">Vous ne participez à aucun événement.</p>
+      <div id="myEventsListContainer"></div>
+    </div>
+  </div>
+
+  <!-- PAGE : NOTIFICATIONS -->
+  <div class="page" id="page-notifications">
+    <div class="comm-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span onclick="goBack()" style="cursor:pointer; font-size:22px; font-weight:700; color:#5f5e5a; line-height:1; padding:2px 4px;">&#8592;</span>
+        <span data-i18n="notifications_title">Notifications</span>
+      </div>
+    </div>
+    <div class="content" style="padding-top:4px;">
+      <div id="notificationsListContainer"></div>
+    </div>
+  </div>
+
+  <!-- PAGE : DETAIL EVENEMENT -->
+  <div class="page" id="page-evenement-detail">
+    <div class="event-detail-banner">
+      <button class="back-icon" onclick="goBack()" style="font-size:18px; font-weight:700;">&#8592;</button>
+      <button class="heart-icon" id="eventHeartBtn" onclick="toggleFavoriteEvent(currentEventIndex)"><i class="ti ti-heart"></i></button>
+      <i class="ti ti-calendar-event calendar-icon"></i>
+    </div>
+    <div class="event-detail-body">
+      <span class="event-cat" id="eCat">Mon programme</span>
+      <p class="event-detail-title" id="eTitle">5 à 7 - Génie logiciel</p>
+      <div class="event-meta-row"><i class="ti ti-calendar"></i><div><p class="k" data-i18n="label_date">Date</p><p class="v" id="eDate">Jeudi 25 septembre 2026</p></div></div>
+      <div class="event-meta-row"><i class="ti ti-clock"></i><div><p class="k" data-i18n="label_time">Heure</p><p class="v" id="eTime">17h00 - 19h00</p></div></div>
+      <div class="event-meta-row"><i class="ti ti-map-pin"></i><div><p class="k" data-i18n="label_location">Lieu</p><p class="v" id="eLocation">Pavillon A, salle commune</p></div></div>
+      <p class="detail-desc" id="eDesc">Viens réseauter avec les étudiants et diplômés du programme autour de bouchées et boissons non-alcoolisées.</p>
+      <div class="attendees-row">
+        <div class="stack">
+          <div class="av bg-blue"><i class="ti ti-user text-blue" style="font-size:12px;"></i></div>
+          <div class="av bg-green"><i class="ti ti-user text-green" style="font-size:12px;"></i></div>
+          <div class="av bg-orange"><i class="ti ti-user text-orange" style="font-size:12px;"></i></div>
+        </div>
+        <span id="attendeesCount">42 participants</span>
+      </div>
+      <button class="rsvp-btn" id="rsvpBtn" onclick="toggleRsvp()">Je participe</button>
+    </div>
+  </div>
+  <!-- PAGE : COURS ET HORAIRE -->
+  <div class="page" id="page-cours">
+    <div class="comm-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span onclick="goBack()" style="cursor:pointer; display:flex; align-items:center; gap:5px; font-size:12.5px; font-weight:600; color:#7A6558;"><span style="font-size:19px; font-weight:700; line-height:1;">&#8592;</span><span data-i18n="back_btn">Retour</span></span>
+      </div>
+    </div>
+    <p class="label" style="padding:0 20px; margin:0 0 6px;" data-i18n="courses_short_title">Cours et horaires</p>
+
+    <div class="filters-row">
+      <div class="filter-chip active" id="coursesViewListBtn" onclick="showCoursesView('list')">📋 <span data-i18n="view_list">Liste</span></div>
+      <div class="filter-chip" id="coursesViewScheduleBtn" onclick="showCoursesView('schedule')">📅 <span data-i18n="view_schedule">Semaine</span></div>
+    </div>
+
+    <div class="content" style="padding-top:4px;">
+
+      <!-- Vue Liste -->
+      <div id="coursesListView">
+        <div class="course-card event-card" style="align-items:flex-start;" onclick="showCourseDetail(0)">
+          <div class="icon-box bg-blue"><i class="ti ti-router text-blue"></i></div>
+          <div class="info">
+            <p class="title" data-i18n="course1_name">Réseautique</p>
+            <p class="meta"><i class="ti ti-clock"></i><span data-i18n="course1_day">Mardi</span> · <span data-i18n="course1_time">9 h à 11 h</span></p>
+            <p class="meta"><i class="ti ti-map-pin"></i><span data-i18n="course1_room">Salle B204</span> · Martin Dubé</p>
+          </div>
+        </div>
+        <div class="course-card event-card" style="align-items:flex-start;" onclick="showCourseDetail(1)">
+          <div class="icon-box bg-green"><i class="ti ti-database text-green"></i></div>
+          <div class="info">
+            <p class="title" data-i18n="course2_name">Base de données</p>
+            <p class="meta"><i class="ti ti-clock"></i><span data-i18n="course2_day">Mercredi</span> · <span data-i18n="course2_time">13 h à 15 h</span></p>
+            <p class="meta"><i class="ti ti-map-pin"></i><span data-i18n="course2_room">Salle A102</span> · Nadia Haddad</p>
+          </div>
+        </div>
+        <div class="course-card event-card" style="align-items:flex-start;" onclick="showCourseDetail(2)">
+          <div class="icon-box bg-orange"><i class="ti ti-cpu text-orange"></i></div>
+          <div class="info">
+            <p class="title" data-i18n="course3_name">Systèmes d'exploitation</p>
+            <p class="meta"><i class="ti ti-clock"></i><span data-i18n="course3_day">Jeudi</span> · <span data-i18n="course3_time">10 h à 12 h</span></p>
+            <p class="meta"><i class="ti ti-map-pin"></i><span data-i18n="course3_room">Salle C301</span> · Julien Roy</p>
+          </div>
+        </div>
+        <div class="course-card event-card" style="align-items:flex-start;" onclick="showCourseDetail(3)">
+          <div class="icon-box bg-red"><i class="ti ti-code text-red"></i></div>
+          <div class="info">
+            <p class="title" data-i18n="course4_name">Développement web</p>
+            <p class="meta"><i class="ti ti-clock"></i><span data-i18n="course4_day">Vendredi</span> · <span data-i18n="course4_time">14 h à 16 h</span></p>
+            <p class="meta"><i class="ti ti-map-pin"></i><span data-i18n="course4_room">Salle B105</span> · Sophie Nguyen</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vue Horaire de la semaine -->
+      <div id="coursesScheduleView" style="display:none;">
+        <div class="schedule-row">
+          <span class="schedule-day" data-i18n="day_monday">Lundi</span>
+          <span class="schedule-course muted" data-i18n="no_class">Aucun cours</span>
+        </div>
+        <div class="schedule-row">
+          <span class="schedule-day" data-i18n="course1_day">Mardi</span>
+          <span class="schedule-course"><span data-i18n="course1_name">Réseautique</span> · <span data-i18n="course1_time">9 h à 11 h</span></span>
+        </div>
+        <div class="schedule-row">
+          <span class="schedule-day" data-i18n="course2_day">Mercredi</span>
+          <span class="schedule-course"><span data-i18n="course2_name">Base de données</span> · <span data-i18n="course2_time">13 h à 15 h</span></span>
+        </div>
+        <div class="schedule-row">
+          <span class="schedule-day" data-i18n="course3_day">Jeudi</span>
+          <span class="schedule-course"><span data-i18n="course3_name">Systèmes d'exploitation</span> · <span data-i18n="course3_time">10 h à 12 h</span></span>
+        </div>
+        <div class="schedule-row">
+          <span class="schedule-day" data-i18n="course4_day">Vendredi</span>
+          <span class="schedule-course"><span data-i18n="course4_name">Développement web</span> · <span data-i18n="course4_time">14 h à 16 h</span></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PAGE : DETAIL D'UN COURS -->
+  <div class="page" id="page-course-detail">
+    <div class="detail-photo">
+      <button class="back-icon" onclick="goBack()" style="font-size:18px; font-weight:700;">&#8592;</button>
+      <i class="ti ti-router house-icon" id="courseDetailIcon"></i>
+    </div>
+    <div class="detail-body">
+      <p class="detail-price" id="courseDetailName">Réseautique</p>
+      <div class="event-meta-row" style="margin-top:14px;"><i class="ti ti-calendar"></i><div><p class="k" data-i18n="label_date">Date</p><p class="v" id="courseDetailDay">Mardi</p></div></div>
+      <div class="event-meta-row"><i class="ti ti-clock"></i><div><p class="k" data-i18n="label_time">Heure</p><p class="v" id="courseDetailTime">9 h à 11 h</p></div></div>
+      <div class="event-meta-row"><i class="ti ti-map-pin"></i><div><p class="k" data-i18n="label_location">Lieu</p><p class="v" id="courseDetailRoom">Salle B204</p></div></div>
+      <div class="event-meta-row"><i class="ti ti-user"></i><div><p class="k" data-i18n="label_teacher">Professeur</p><p class="v" id="courseDetailTeacher">Martin Dubé</p></div></div>
+      <p class="label" data-i18n="label_description">Description</p>
+      <p class="detail-desc" id="courseDetailDesc">Description du cours.</p>
+    </div>
+  </div>
+
+  <!-- FENETRE DE CONFIRMATION : suppression d'une publication -->
+  <div class="modal-overlay" id="deleteConfirmOverlay" style="display:none;">
+    <div class="modal-box">
+      <p class="modal-title" data-i18n="confirm_delete_post">Voulez-vous vraiment supprimer cette publication ?</p>
+      <div class="modal-actions">
+        <button class="secondary-btn" onclick="cancelDeletePost()" data-i18n="cancel_btn">Annuler</button>
+        <button class="modal-delete-btn" onclick="confirmDeletePost()" data-i18n="delete_post_btn">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+  /* ===== SYSTEME BILINGUE ===== */
+  let currentLang = 'fr';
+
+  const translations = {
+    fr: {
+      caption: "Prototype interactif StudLife — clique sur les boutons !",
+      nav_home: "Accueil", nav_community: "Communauté", nav_events: "Événements", nav_profile: "Profil",
+      auth_subtitle: "Trouve ton logement et ta communauté étudiante",
+      auth_tab_login: "Connexion", auth_tab_signup: "Inscription",
+      field_email_label: "Email étudiant", field_password_label: "Mot de passe",
+      auth_submit: "Créer mon compte", auth_switch_plain: "Déjà un compte ? ", auth_switch_bold: "Se connecter",
+      home_search_placeholder: "Que cherches-tu aujourd'hui ?", home_suggestions: "Suggestions",
+      sugg_housing: "Studio près du campus", sugg_roommate: "Colocataire compatible",
+      sugg_events: "Événements de mon programme", sugg_courses: "Cours et horaires de session",
+      sugg_courses_alert: "Section Cours bientôt disponible !",
+      group1_title: "Génie logiciel", group1_members: "128 membres",
+      group2_title: "Statistiques", group2_members: "64 membres",
+      group3_title: "Sport campus", group3_members: "95 membres",
+      posts_label: "Publications récentes",
+      post1_meta: "Génie logiciel · il y a 2h", post1_body: "Quelqu'un pour former un groupe d'étude avant l'examen d'algo jeudi ?",
+      post2_meta: "Sport campus · il y a 5h", post2_body: "Match amical de volleyball samedi au pavillon sportif, tout le monde bienvenu !",
+      join_btn: "Rejoindre un groupe", join_btn_sent: "Demande envoyée",
+      profile_program: "Génie logiciel · UQAM",
+      info_fullname_label: "Nom complet", info_institution_label: "Établissement",
+      info_program_label: "Programme d'études", info_program_value: "Génie logiciel · 3e année",
+      prefs_label: "Préférences", pref_smoke: "Non-fumeur", pref_budget: "Budget 500-700$",
+      pref_coloc: "Colocation ok", pref_metro: "Près du métro",
+      housing_title: "Logements", filter_all: "Tous", filter_studio: "Studio", filter_coloc: "Colocation",
+      listing1_price: "650 $ / mois", listing1_addr: "Studio · 12 min de l'UdeM",
+      listing1_tag1: "Meublé", listing1_tag2: "Chauffage inclus",
+      listing2_price: "480 $ / mois", listing2_addr: "Coloc 3 1/2 · Plateau Mont-Royal",
+      listing2_tag1: "2 colocataires", listing2_tag2: "Animaux ok",
+      label_description: "Description", label_roommate: "Colocataire potentiel",
+      amenity_wifi: "Wifi incl.", amenity_parking: "Stationnement",
+      contact_btn: "Contacter le propriétaire", contact_btn_sent: "Message envoyé ✓",
+      filter_program: "Mon programme", filter_sport: "Sportif",
+      event1_title: "5 à 7 - Génie logiciel", event1_meta: "17h00 · Pavillon A", event1_tag: "Mon programme", event1_mon: "Sept",
+      event2_title: "Groupe d'étude - Statistiques", event2_meta: "10h00 · Bibliothèque", event2_tag: "Étude", event2_mon: "Sept",
+      event3_title: "Match de volleyball amical", event3_meta: "14h00 · Pavillon sportif", event3_tag: "Sportif", event3_mon: "Oct",
+      label_date: "Date", label_time: "Heure", label_location: "Lieu",
+      rsvp_btn: "Je participe", rsvp_btn_going: "Tu participes ✓", participants_word: "participants",
+      field_fullname_label: "Nom complet", field_school_label: "Établissement scolaire",
+      field_program_label: "Programme d'études", field_lang_pref_label: "Langue préférée",
+      lang_pref_fr: "Français", lang_pref_en: "English",
+      err_fullname: "Le nom complet est requis.", err_email: "L'adresse courriel est requise.",
+      err_email_format: "L'adresse courriel n'est pas valide.", err_school: "L'établissement scolaire est requis.",
+      err_program: "Le programme d'études est requis.", err_password: "Le mot de passe est requis.",
+      err_password_short: "Le mot de passe doit contenir au moins 6 caractères.",
+      error_intro: "Merci de corriger les champs suivants :",
+      success_title: "Compte créé avec succès !",
+      success_message: "Bienvenue sur StudLife. Tu peux maintenant explorer l'application.",
+      continue_btn: "Continuer vers l'accueil",
+      login_submit: "Se connecter",
+      login_no_account_plain: "Pas de compte ? ", link_create_account: "Créer un compte",
+      link_forgot_password: "Mot de passe oublié ?",
+      forgot_password_alert: "Cette fonctionnalité sera bientôt disponible !",
+      login_success_title: "Connexion réussie (simulation)",
+      login_success_message: "Ceci est une simulation : aucune vérification réelle de compte n'est faite pour le moment. Une vraie authentification sera ajoutée plus tard avec une base de données.",
+      forgot_intro: "Entre ton adresse courriel, on te dirait comment réinitialiser ton mot de passe (simulation).",
+      forgot_submit: "Envoyer",
+      back_to_login: "← Retour à la connexion",
+      forgot_success_title: "Lien envoyé (simulation)",
+      forgot_success_message: "Si un compte existait avec cette adresse, un lien de réinitialisation lui serait envoyé. Aucun email n'a réellement été envoyé.",
+      courses_title: "Mes cours et mon horaire", view_list: "Liste", view_schedule: "Semaine",
+      back_btn: "Retour", courses_short_title: "Cours et horaires", label_teacher: "Professeur",
+      day_monday: "Lundi", no_class: "Aucun cours",
+      course1_name: "Réseautique", course1_day: "Mardi", course1_time: "9 h à 11 h", course1_room: "Salle B204",
+      course2_name: "Base de données", course2_day: "Mercredi", course2_time: "13 h à 15 h", course2_room: "Salle A102",
+      course3_name: "Systèmes d'exploitation", course3_day: "Jeudi", course3_time: "10 h à 12 h", course3_room: "Salle C301",
+      course4_name: "Développement web", course4_day: "Vendredi", course4_time: "14 h à 16 h", course4_room: "Salle B105",
+      field_name_label: "Nom", field_school_short_label: "École", field_program_short_label: "Programme",
+      field_city_label: "Ville", field_language_label: "Langue",
+      edit_profile_btn_text: "Modifier mon profil", logout_btn_text: "Se déconnecter",
+      save_btn: "Enregistrer", cancel_btn: "Annuler",
+      logout_confirm_title: "Voulez-vous vraiment vous déconnecter ?", logout_confirm_yes: "Oui, me déconnecter",
+      housing_search_placeholder: "Rechercher un logement, un quartier...", clear_btn: "Effacer",
+      filters_label: "Filtres", housing_type_label: "Type de logement",
+      type_all: "Tous", type_studio: "Studio", type_apartment: "Appartement", type_room: "Chambre", type_coloc: "Colocation",
+      max_price_label: "Prix maximum", no_max_price: "Aucun maximum", neighborhood_label: "Quartier",
+      reset_filters_btn: "Réinitialiser les filtres", no_housing_found: "Aucun logement trouvé.",
+      housing_found_singular: "logement trouvé", housing_found_plural: "logements trouvés",
+      favorites_title: "Mes favoris", no_favorites_housing: "Vous n'avez aucun logement favori.",
+      no_favorites_events: "Vous n'avez aucun événement favori.",
+      my_events_title: "Mes événements", no_my_events: "Vous ne participez à aucun événement.",
+      create_post_placeholder: "Exprime-toi...", publish_btn: "Publier",
+      just_now: "À l'instant", write_comment_placeholder: "Écris un commentaire...", comment_send_btn: "Envoyer",
+      members_word: "membres", group_no_posts: "Aucune publication dans ce groupe pour le moment.",
+      you_tag: "Vous", edit_post_btn: "Modifier", delete_post_btn: "Supprimer",
+      confirm_delete_post: "Voulez-vous vraiment supprimer cette publication ?",
+      notifications_title: "Notifications",
+      greeting_hello: "Bonjour", dash_next_course: "Prochain cours", dash_recent_housing: "Logements récents",
+      dash_upcoming_events: "Prochains événements", dash_quick_access: "Accès rapide", dash_my_courses: "Mes cours"
+    },
+    en: {
+      caption: "Interactive StudLife prototype — click the buttons!",
+      nav_home: "Home", nav_community: "Community", nav_events: "Events", nav_profile: "Profile",
+      auth_subtitle: "Find your housing and your student community",
+      auth_tab_login: "Log in", auth_tab_signup: "Sign up",
+      field_email_label: "Student email", field_password_label: "Password",
+      auth_submit: "Create my account", auth_switch_plain: "Already have an account? ", auth_switch_bold: "Log in",
+      home_search_placeholder: "What are you looking for today?", home_suggestions: "Suggestions",
+      sugg_housing: "Studio near campus", sugg_roommate: "Compatible roommate",
+      sugg_events: "Events in my program", sugg_courses: "Courses and semester schedule",
+      sugg_courses_alert: "Courses section coming soon!",
+      group1_title: "Software Engineering", group1_members: "128 members",
+      group2_title: "Statistics", group2_members: "64 members",
+      group3_title: "Campus Sports", group3_members: "95 members",
+      posts_label: "Recent posts",
+      post1_meta: "Software Engineering · 2h ago", post1_body: "Anyone up for a study group before Thursday's algo exam?",
+      post2_meta: "Campus Sports · 5h ago", post2_body: "Friendly volleyball match Saturday at the sports building, everyone welcome!",
+      join_btn: "Join a group", join_btn_sent: "Request sent",
+      profile_program: "Software Engineering · UQAM",
+      info_fullname_label: "Full name", info_institution_label: "Institution",
+      info_program_label: "Program of study", info_program_value: "Software Engineering · 3rd year",
+      prefs_label: "Preferences", pref_smoke: "Non-smoker", pref_budget: "Budget 500-700$",
+      pref_coloc: "Open to roommates", pref_metro: "Near the metro",
+      housing_title: "Housing", filter_all: "All", filter_studio: "Studio", filter_coloc: "Shared",
+      listing1_price: "650 $ / month", listing1_addr: "Studio · 12 min from UdeM",
+      listing1_tag1: "Furnished", listing1_tag2: "Heating included",
+      listing2_price: "480 $ / month", listing2_addr: "3-bedroom apt · Plateau Mont-Royal",
+      listing2_tag1: "2 roommates", listing2_tag2: "Pets ok",
+      label_description: "Description", label_roommate: "Potential roommate",
+      amenity_wifi: "Wifi incl.", amenity_parking: "Parking",
+      contact_btn: "Contact the landlord", contact_btn_sent: "Message sent ✓",
+      filter_program: "My program", filter_sport: "Sports",
+      event1_title: "Networking - Software Engineering", event1_meta: "5:00 PM · Building A", event1_tag: "My program", event1_mon: "Sep",
+      event2_title: "Study group - Statistics", event2_meta: "10:00 AM · Library", event2_tag: "Study", event2_mon: "Sep",
+      event3_title: "Friendly volleyball match", event3_meta: "2:00 PM · Sports building", event3_tag: "Sports", event3_mon: "Oct",
+      label_date: "Date", label_time: "Time", label_location: "Location",
+      rsvp_btn: "I'm going", rsvp_btn_going: "You're going ✓", participants_word: "attendees",
+      field_fullname_label: "Full name", field_school_label: "School",
+      field_program_label: "Program of study", field_lang_pref_label: "Preferred language",
+      lang_pref_fr: "Français", lang_pref_en: "English",
+      err_fullname: "Full name is required.", err_email: "Email address is required.",
+      err_email_format: "Email address is not valid.", err_school: "School is required.",
+      err_program: "Program of study is required.", err_password: "Password is required.",
+      err_password_short: "Password must be at least 6 characters.",
+      error_intro: "Please fix the following fields:",
+      success_title: "Account created successfully!",
+      success_message: "Welcome to StudLife. You can now explore the app.",
+      continue_btn: "Continue to home",
+      login_submit: "Log in",
+      login_no_account_plain: "No account yet? ", link_create_account: "Create an account",
+      link_forgot_password: "Forgot password?",
+      forgot_password_alert: "This feature will be available soon!",
+      login_success_title: "Login successful (simulation)",
+      login_success_message: "This is a simulation: no real account check is done yet. Real authentication will be added later with a database.",
+      forgot_intro: "Enter your email, we would tell you how to reset your password (simulation).",
+      forgot_submit: "Send",
+      back_to_login: "← Back to login",
+      forgot_success_title: "Link sent (simulation)",
+      forgot_success_message: "If an account existed with this address, a reset link would be sent to it. No email was actually sent.",
+      courses_title: "My courses and schedule", view_list: "List", view_schedule: "Week",
+      back_btn: "Back", courses_short_title: "Courses and schedule", label_teacher: "Instructor",
+      day_monday: "Monday", no_class: "No class",
+      course1_name: "Networking", course1_day: "Tuesday", course1_time: "9 AM - 11 AM", course1_room: "Room B204",
+      course2_name: "Databases", course2_day: "Wednesday", course2_time: "1 PM - 3 PM", course2_room: "Room A102",
+      course3_name: "Operating Systems", course3_day: "Thursday", course3_time: "10 AM - 12 PM", course3_room: "Room C301",
+      course4_name: "Web Development", course4_day: "Friday", course4_time: "2 PM - 4 PM", course4_room: "Room B105",
+      field_name_label: "Name", field_school_short_label: "School", field_program_short_label: "Program",
+      field_city_label: "City", field_language_label: "Language",
+      edit_profile_btn_text: "Edit Profile", logout_btn_text: "Log out",
+      save_btn: "Save", cancel_btn: "Cancel",
+      logout_confirm_title: "Are you sure you want to log out?", logout_confirm_yes: "Yes, log out",
+      housing_search_placeholder: "Search for a housing, neighborhood...", clear_btn: "Clear",
+      filters_label: "Filters", housing_type_label: "Housing type",
+      type_all: "All", type_studio: "Studio", type_apartment: "Apartment", type_room: "Room", type_coloc: "Shared housing",
+      max_price_label: "Maximum price", no_max_price: "No maximum", neighborhood_label: "Neighborhood",
+      reset_filters_btn: "Reset filters", no_housing_found: "No housing found.",
+      housing_found_singular: "housing listing found", housing_found_plural: "housing listings found",
+      favorites_title: "My Favorites", no_favorites_housing: "You have no favorite housing listings.",
+      no_favorites_events: "You have no favorite events.",
+      my_events_title: "My Events", no_my_events: "You are not attending any events.",
+      create_post_placeholder: "Share something...", publish_btn: "Post",
+      just_now: "Just now", write_comment_placeholder: "Write a comment...", comment_send_btn: "Send",
+      members_word: "members", group_no_posts: "No posts in this group yet.",
+      you_tag: "You", edit_post_btn: "Edit", delete_post_btn: "Delete",
+      confirm_delete_post: "Are you sure you want to delete this post?",
+      notifications_title: "Notifications",
+      greeting_hello: "Hello", dash_next_course: "Next class", dash_recent_housing: "Recent housing",
+      dash_upcoming_events: "Upcoming events", dash_quick_access: "Quick access", dash_my_courses: "My courses"
+    }
+  };
+
+  // Fonction courte : va chercher le texte de la clé dans la langue actuelle
+  function t(key) {
+    return translations[currentLang][key];
+  }
+
+  // Applique la langue à tous les textes fixes de la page
+  function applyStaticTexts() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = t(el.dataset.i18n);
+    });
+    document.getElementById('langToggle').textContent = currentLang === 'fr' ? 'EN' : 'FR';
+    document.documentElement.lang = currentLang;
+  }
+
+  function toggleLanguage() {
+    currentLang = (currentLang === 'fr') ? 'en' : 'fr';
+    applyStaticTexts();
+
+    // On met aussi à jour les textes déjà affichés dynamiquement
+    renderListingText(currentListingIndex);
+    renderEventText(currentEventIndex);
+    updateRsvpDisplay();
+
+    const contactBtn = document.getElementById('contactBtn');
+    contactBtn.textContent = contactBtn.classList.contains('sent') ? t('contact_btn_sent') : t('contact_btn');
+
+    document.getElementById('joinBtnText').textContent =
+      document.getElementById('joinBtn').classList.contains('joined') ? t('join_btn_sent') : t('join_btn');
+
+    renderProfileDisplay();
+    populateNeighborhoodOptions();
+    renderHousingList();
+    renderFavoritesList();
+    renderEventsList();
+    renderFavoriteEventsList();
+    refreshPosts();
+    if (currentGroupKey && document.getElementById('page-group-detail').classList.contains('active')) {
+      const g = groups.find(x => x.key === currentGroupKey);
+      document.getElementById('groupDetailName').textContent = g.name[currentLang];
+      document.getElementById('groupDetailMembers').textContent = g.members + ' ' + t('members_word');
+    }
+    renderNotifications();
+    renderDashboard();
+    if (document.getElementById('page-course-detail').classList.contains('active')) {
+      renderCourseDetailText(currentCourseIndex);
+    }
+    if (document.getElementById('page-evenement-detail').classList.contains('active')) {
+      renderEventText(currentEventIndex);
+      updateRsvpDisplay();
+    }
+  }
+
+  /* ===== MON PROFIL ===== */
+  // Les données du profil sont gardées seulement en mémoire (JavaScript),
+  // rien n'est envoyé ni sauvegardé sur un serveur ou une base de données.
+  let profileData = {
+    name: "Anta Top",
+    school: "Collège Boréal",
+    program: "Soutien technique en informatique",
+    city: "Toronto",
+    language: "fr"
+  };
+
+  // Met à jour tout ce qui est affiché sur la page profil avec les données actuelles
+  function renderProfileDisplay() {
+    document.getElementById('profileHeaderName').textContent = profileData.name;
+    document.getElementById('profileHeaderSub').textContent = profileData.program + ' · ' + profileData.school;
+    document.getElementById('profileViewName').textContent = profileData.name;
+    document.getElementById('profileViewSchool').textContent = profileData.school;
+    document.getElementById('profileViewProgram').textContent = profileData.program;
+    document.getElementById('profileViewCity').textContent = profileData.city;
+    document.getElementById('profileViewLanguage').textContent = profileData.language === 'fr' ? t('lang_pref_fr') : t('lang_pref_en');
+  }
+
+  // Cache les 3 vues possibles de la page profil (affichage / édition / déconnexion)
+  function hideAllProfileViews() {
+    document.getElementById('profileDisplayView').style.display = 'none';
+    document.getElementById('profileEditView').style.display = 'none';
+    document.getElementById('profileLogoutView').style.display = 'none';
+  }
+
+  function showProfileEdit() {
+    hideAllProfileViews();
+    // On remplit le formulaire avec les valeurs actuelles
+    document.getElementById('editNameInput').value = profileData.name;
+    document.getElementById('editSchoolInput').value = profileData.school;
+    document.getElementById('editProgramInput').value = profileData.program;
+    document.getElementById('editCityInput').value = profileData.city;
+    selectProfileLang(profileData.language);
+    document.getElementById('profileEditView').style.display = 'block';
+  }
+
+  function selectProfileLang(lang) {
+    profileEditLangChoice = lang;
+    document.getElementById('editLangFrBtn').classList.toggle('selected', lang === 'fr');
+    document.getElementById('editLangEnBtn').classList.toggle('selected', lang === 'en');
+  }
+  let profileEditLangChoice = 'fr';
+
+  function saveProfile() {
+    profileData.name = document.getElementById('editNameInput').value.trim() || profileData.name;
+    profileData.school = document.getElementById('editSchoolInput').value.trim() || profileData.school;
+    profileData.program = document.getElementById('editProgramInput').value.trim() || profileData.program;
+    profileData.city = document.getElementById('editCityInput').value.trim() || profileData.city;
+    profileData.language = profileEditLangChoice;
+    renderProfileDisplay();
+    hideAllProfileViews();
+    document.getElementById('profileDisplayView').style.display = 'block';
+  }
+
+  function cancelProfileEdit() {
+    hideAllProfileViews();
+    document.getElementById('profileDisplayView').style.display = 'block';
+  }
+
+  function showLogoutConfirm() {
+    hideAllProfileViews();
+    document.getElementById('profileLogoutView').style.display = 'block';
+  }
+
+  function cancelLogout() {
+    hideAllProfileViews();
+    document.getElementById('profileDisplayView').style.display = 'block';
+  }
+
+  // Déconnexion simulée : aucune vraie session n'existe, on ramène juste
+  // la personne à l'écran de connexion, comme si elle s'était déconnectée.
+  function confirmLogout() {
+    hideAllProfileViews();
+    document.getElementById('profileDisplayView').style.display = 'block';
+    showPage('auth');
+    switchAuthTab('login');
+  }
+
+  /* ===== COURS ET HORAIRE ===== */
+  /* ===== DETAIL D'UN COURS ===== */
+  // Icône, couleur et enseignant de chaque cours (le nom/jour/heure/salle viennent
+  // déjà du dictionnaire de traductions, on ne les duplique pas ici).
+  const courseData = [
+    { icon: "ti-router", teacher: "Martin Dubé", descFr: "Introduction aux réseaux informatiques : protocoles, câblage et configuration de base.", descEn: "Introduction to computer networks: protocols, cabling and basic configuration." },
+    { icon: "ti-database", teacher: "Nadia Haddad", descFr: "Conception et gestion de bases de données relationnelles avec le langage SQL.", descEn: "Design and management of relational databases using SQL." },
+    { icon: "ti-cpu", teacher: "Julien Roy", descFr: "Fonctionnement des systèmes d'exploitation : gestion de la mémoire, des processus et des fichiers.", descEn: "How operating systems work: memory, process and file management." },
+    { icon: "ti-code", teacher: "Sophie Nguyen", descFr: "Création de sites web interactifs avec HTML, CSS et JavaScript.", descEn: "Building interactive websites with HTML, CSS and JavaScript." }
+  ];
+  let currentCourseIndex = 0;
+
+  function renderCourseDetailText(index) {
+    const c = courseData[index];
+    const n = index + 1;
+    document.getElementById('courseDetailName').textContent = t('course' + n + '_name');
+    document.getElementById('courseDetailDay').textContent = t('course' + n + '_day');
+    document.getElementById('courseDetailTime').textContent = t('course' + n + '_time');
+    document.getElementById('courseDetailRoom').textContent = t('course' + n + '_room');
+    document.getElementById('courseDetailTeacher').textContent = c.teacher;
+    document.getElementById('courseDetailDesc').textContent = currentLang === 'fr' ? c.descFr : c.descEn;
+    document.getElementById('courseDetailIcon').className = 'ti ' + c.icon + ' house-icon';
+  }
+
+  function showCourseDetail(index) {
+    currentCourseIndex = index;
+    renderCourseDetailText(index);
+    showPage('course-detail');
+  }
+
+  function showCoursesView(view) {
+    const isList = view === 'list';
+    document.getElementById('coursesViewListBtn').classList.toggle('active', isList);
+    document.getElementById('coursesViewScheduleBtn').classList.toggle('active', !isList);
+    document.getElementById('coursesListView').style.display = isList ? 'block' : 'none';
+    document.getElementById('coursesScheduleView').style.display = isList ? 'none' : 'block';
+  }
+
+  /* ===== NAVIGATION ENTRE PAGES ===== */
+  /* ===== NAVIGATION ENTRE PAGES (avec historique pour le bouton Retour) ===== */
+  let pageHistory = [];
+
+  function showPage(name, addToHistory) {
+    if (addToHistory === undefined) addToHistory = true;
+    const current = document.querySelector('.page.active');
+    if (addToHistory && current && current.id !== 'page-' + name) {
+      pageHistory.push(current.id.replace('page-', ''));
+    }
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => {
+      n.classList.toggle('active', n.dataset.nav === name);
+    });
+    if (name === 'accueil') renderDashboard();
+  }
+
+  // Fonction réutilisable pour tous les boutons "Retour" : ramène à la page
+  // précédente réellement visitée (pas une destination fixe codée en dur).
+  function goBack() {
+    const previous = pageHistory.pop();
+    showPage(previous || 'accueil', false);
+  }
+
+  /* ===== LOGEMENTS ===== */
+  const listings = [
+    {
+      title: { fr: "Studio près de l'UdeM", en: "Studio near UdeM" },
+      price: { fr: "650 $ / mois", en: "650 $ / month" },
+      priceValue: 650,
+      typeKey: "studio",
+      neighborhoodKey: "udem",
+      neighborhoodLabel: { fr: "Près de l'UdeM", en: "Near UdeM" },
+      icon: "ti-building",
+      tags: [
+        { fr: "Meublé", en: "Furnished" },
+        { fr: "Chauffage inclus", en: "Heating included" }
+      ],
+      addr: { fr: "Studio · 12 min de marche de l'UdeM", en: "Studio · 12 min walk from UdeM" },
+      size: "28 m²",
+      rooms: { fr: "1 chambre", en: "1 bedroom" },
+      desc: {
+        fr: "Studio lumineux et rénové, à distance de marche du campus. Idéal pour un étudiant, épicerie et transport en commun à proximité.",
+        en: "Bright, renovated studio within walking distance of campus. Ideal for a student, grocery store and public transit nearby."
+      },
+      roommateName: { fr: "Alex, 21 ans", en: "Alex, 21 years old" },
+      roommateInfo: { fr: "Génie logiciel · Non-fumeur", en: "Software Engineering · Non-smoker" }
+    },
+    {
+      title: { fr: "Coloc 3 1/2 - Plateau Mont-Royal", en: "3-bedroom apt - Plateau Mont-Royal" },
+      price: { fr: "480 $ / mois", en: "480 $ / month" },
+      priceValue: 480,
+      typeKey: "colocation",
+      neighborhoodKey: "plateau",
+      neighborhoodLabel: { fr: "Plateau Mont-Royal", en: "Plateau Mont-Royal" },
+      icon: "ti-home",
+      tags: [
+        { fr: "2 colocataires", en: "2 roommates" },
+        { fr: "Animaux ok", en: "Pets ok" }
+      ],
+      addr: { fr: "Coloc 3 1/2 · Plateau Mont-Royal", en: "3-bedroom apt · Plateau Mont-Royal" },
+      size: "45 m²",
+      rooms: { fr: "3 chambres", en: "3 bedrooms" },
+      desc: {
+        fr: "Grand appartement partagé, proche du métro et des restos du Plateau. Ambiance conviviale, animaux acceptés.",
+        en: "Large shared apartment, close to the metro and Plateau restaurants. Friendly vibe, pets welcome."
+      },
+      roommateName: { fr: "Jade, 22 ans", en: "Jade, 22 years old" },
+      roommateInfo: { fr: "Sciences politiques · A un chat", en: "Political Science · Has a cat" }
+    }
+  ];
+
+  let currentListingIndex = 0;
+
+  function renderListingText(index) {
+    const l = listings[index];
+    document.getElementById('dPrice').textContent = l.price[currentLang];
+    document.getElementById('dAddr').textContent = l.addr[currentLang];
+    document.getElementById('dSize').textContent = l.size;
+    document.getElementById('dRooms').textContent = l.rooms[currentLang];
+    document.getElementById('dDesc').textContent = l.desc[currentLang];
+    document.getElementById('dRoommateName').textContent = l.roommateName[currentLang];
+    document.getElementById('dRoommateInfo').textContent = l.roommateInfo[currentLang];
+  }
+
+  /* ===== RECHERCHE ET FILTRES LOGEMENTS ===== */
+  let currentHousingType = 'all';
+
+  let favoriteListingIndices = [];
+
+  function isListingFavorite(index) {
+    return favoriteListingIndices.includes(index);
+  }
+
+  function toggleFavoriteListing(index, event) {
+    if (event) event.stopPropagation(); // empêche d'ouvrir le détail en cliquant sur le coeur
+    const pos = favoriteListingIndices.indexOf(index);
+    if (pos === -1) {
+      favoriteListingIndices.push(index);
+      const l = listings[index];
+      addNotification(
+        'Le logement « ' + l.title.fr + ' » a été ajouté à vos favoris.',
+        'The listing "' + l.title.en + '" was added to your favorites.',
+        { type: 'listing', index: index }
+      );
+    } else {
+      favoriteListingIndices.splice(pos, 1);
+    }
+    renderHousingList();
+    renderFavoritesList();
+    // Si on est sur la fiche détail de ce logement, on met à jour son coeur aussi
+    if (currentListingIndex === index) {
+      document.getElementById('heartBtn').classList.toggle('liked', isListingFavorite(index));
+    }
+  }
+
+  // Construit le HTML d'une carte de logement (utilisé pour la liste ET pour les favoris)
+  function buildListingCardHtml(l, index) {
+    const likedClass = isListingFavorite(index) ? 'liked' : '';
+    return '<button class="listing-card" onclick="showListing(' + index + ')">' +
+      '<div class="listing-photo"><i class="ti ' + l.icon + '"></i>' +
+        '<span class="card-heart-btn ' + likedClass + '" onclick="toggleFavoriteListing(' + index + ', event)"><i class="ti ti-heart"></i></span>' +
+      '</div>' +
+      '<div class="listing-info">' +
+        '<p class="price">' + l.price[currentLang] + '</p>' +
+        '<p class="addr"><i class="ti ti-map-pin"></i> ' + l.addr[currentLang] + '</p>' +
+        '<div class="listing-tags">' +
+          '<span class="listing-tag">' + l.tags[0][currentLang] + '</span>' +
+          '<span class="listing-tag">' + l.tags[1][currentLang] + '</span>' +
+        '</div>' +
+      '</div>' +
+    '</button>';
+  }
+
+  function renderFavoritesList() {
+    const container = document.getElementById('favoritesListContainer');
+    const emptyMsg = document.getElementById('favoritesEmptyMsg');
+    let html = '';
+    listings.forEach((l, index) => {
+      if (isListingFavorite(index)) html += buildListingCardHtml(l, index);
+    });
+    container.innerHTML = html;
+    emptyMsg.style.display = favoriteListingIndices.length === 0 ? 'block' : 'none';
+  }
+
+  // Réutilise buildEventCardHtml (déjà utilisée pour la liste Événements et Mes événements)
+  function renderFavoriteEventsList() {
+    const container = document.getElementById('favoritesEventsListContainer');
+    const emptyMsg = document.getElementById('favoritesEventsEmptyMsg');
+    let html = '';
+    events.forEach((e, index) => {
+      if (isEventFavorite(index)) html += buildEventCardHtml(e, index);
+    });
+    container.innerHTML = html;
+    emptyMsg.style.display = eventFavorites.length === 0 ? 'block' : 'none';
+  }
+
+  function getTypeLabel(typeKey) {
+    if (typeKey === 'studio') return t('type_studio');
+    if (typeKey === 'apartment') return t('type_apartment');
+    if (typeKey === 'room') return t('type_room');
+    if (typeKey === 'colocation') return t('type_coloc');
+    return '';
+  }
+
+  // Construit la liste déroulante des quartiers à partir des VRAIS logements
+  // présents dans le tableau "listings" (aucun quartier inventé).
+  function populateNeighborhoodOptions() {
+    const select = document.getElementById('housingNeighborhoodSelect');
+    const previousValue = select.value || 'all';
+
+    const uniqueNeighborhoods = [];
+    listings.forEach(l => {
+      const exists = uniqueNeighborhoods.some(n => n.key === l.neighborhoodKey);
+      if (!exists) {
+        uniqueNeighborhoods.push({ key: l.neighborhoodKey, label: l.neighborhoodLabel });
+      }
+    });
+
+    let optionsHtml = '<option value="all">' + t('type_all') + '</option>';
+    uniqueNeighborhoods.forEach(n => {
+      optionsHtml += '<option value="' + n.key + '">' + n.label[currentLang] + '</option>';
+    });
+    select.innerHTML = optionsHtml;
+
+    // On essaie de garder la sélection précédente si elle existe toujours
+    const stillExists = Array.from(select.options).some(o => o.value === previousValue);
+    select.value = stillExists ? previousValue : 'all';
+  }
+
+  function setHousingType(type) {
+    currentHousingType = type;
+    document.querySelectorAll('#housingTypeFilters .filter-chip').forEach(chip => {
+      chip.classList.toggle('active', chip.dataset.type === type);
+    });
+    renderHousingList();
+  }
+
+  function clearHousingSearch() {
+    document.getElementById('housingSearchInput').value = '';
+    renderHousingList();
+  }
+
+  function resetHousingFilters() {
+    document.getElementById('housingSearchInput').value = '';
+    document.getElementById('housingPriceSelect').value = 'none';
+    document.getElementById('housingNeighborhoodSelect').value = 'all';
+    setHousingType('all'); // appelle déjà renderHousingList()
+  }
+
+  // Fonction principale : relit la recherche + les 3 filtres, et réaffiche
+  // uniquement les logements qui correspondent à TOUS les critères actifs.
+  function renderHousingList() {
+    const searchTerm = document.getElementById('housingSearchInput').value.trim().toLowerCase();
+    const maxPrice = document.getElementById('housingPriceSelect').value;
+    const neighborhoodFilter = document.getElementById('housingNeighborhoodSelect').value;
+
+    const container = document.getElementById('housingListContainer');
+    const noResultsMsg = document.getElementById('housingNoResults');
+    let html = '';
+    let count = 0;
+
+    listings.forEach((l, index) => {
+      // 1) filtre Type
+      if (currentHousingType !== 'all' && l.typeKey !== currentHousingType) return;
+      // 2) filtre Prix maximum
+      if (maxPrice !== 'none' && l.priceValue > Number(maxPrice)) return;
+      // 3) filtre Quartier
+      if (neighborhoodFilter !== 'all' && l.neighborhoodKey !== neighborhoodFilter) return;
+      // 4) recherche texte (titre, quartier, type, description)
+      if (searchTerm !== '') {
+        const searchableText = (
+          l.title[currentLang] + ' ' +
+          l.neighborhoodLabel[currentLang] + ' ' +
+          getTypeLabel(l.typeKey) + ' ' +
+          l.desc[currentLang]
+        ).toLowerCase();
+        if (!searchableText.includes(searchTerm)) return;
+      }
+
+      // Le logement passe tous les filtres : on l'ajoute à la liste affichée
+      count++;
+      html += buildListingCardHtml(l, index);
+    });
+
+    container.innerHTML = html;
+    noResultsMsg.style.display = count === 0 ? 'block' : 'none';
+
+    const countLabel = count === 1 ? t('housing_found_singular') : t('housing_found_plural');
+    document.getElementById('housingResultsCount').textContent = count + ' ' + countLabel;
+  }
+
+  function showListing(index) {
+    currentListingIndex = index;
+    renderListingText(index);
+    document.getElementById('heartBtn').classList.toggle('liked', isListingFavorite(index));
+    const contactBtn = document.getElementById('contactBtn');
+    contactBtn.classList.remove('sent');
+    contactBtn.textContent = t('contact_btn');
+    showPage('logement-detail');
+  }
+
+  /* ===== NOTIFICATIONS ===== */
+  // Chaque notification a une "target" qui pointe vers son contenu réel :
+  //   { type: 'event',   index }  -> fiche de l'événement events[index]
+  //   { type: 'listing', index }  -> fiche du logement listings[index]
+  //   { type: 'post',    id }     -> publication posts[id] dans Communauté (id null = la plus récente)
+  //   { type: 'courses' }         -> page Cours et horaires
+  let notifications = [
+    { id: 1, text: { fr: "Un nouvel événement est disponible.", en: "A new event is available." }, read: false, target: { type: 'event', index: 2 } },
+    { id: 2, text: { fr: "Votre logement favori est toujours disponible.", en: "Your favorite housing listing is still available." }, read: false, target: { type: 'listing', index: 0 } },
+    { id: 3, text: { fr: "Quelqu'un a commenté votre publication.", en: "Someone commented on your post." }, read: false, target: { type: 'post', id: null } },
+    { id: 4, text: { fr: "N'oubliez pas votre prochain cours.", en: "Don't forget your next class." }, read: false, target: { type: 'courses' } }
+  ];
+  let nextNotifId = 5;
+
+  // Fonction réutilisable : crée une vraie notification non lue, déclenchée par
+  // une action réelle de l'utilisateur (favori ajouté, participation, commentaire...).
+  // "target" indique quelle page/contenu ouvrir quand on clique dessus.
+  function addNotification(textFr, textEn, target) {
+    notifications.unshift({ id: nextNotifId++, text: { fr: textFr, en: textEn }, read: false, target: target || null });
+    renderNotifications();
+  }
+
+  function getUnreadNotifCount() {
+    return notifications.filter(n => !n.read).length;
+  }
+
+  function updateNotifBadge() {
+    const count = getUnreadNotifCount();
+    const badge = document.getElementById('notifBadgeHome');
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+  }
+
+  function renderNotifications() {
+    const container = document.getElementById('notificationsListContainer');
+    let html = '';
+    notifications.forEach(n => {
+      html += '<div class="notif-item ' + (n.read ? 'read' : '') + '" onclick="openNotification(' + n.id + ')">' +
+        '<div class="notif-icon"><i class="ti ti-bell"></i></div>' +
+        '<p class="notif-text">' + n.text[currentLang] + '</p>' +
+        '<i class="ti ti-x notif-delete" onclick="event.stopPropagation(); deleteNotification(' + n.id + ')"></i>' +
+      '</div>';
+    });
+    container.innerHTML = html;
+    updateNotifBadge();
+  }
+
+  function markNotificationRead(id) {
+    const n = notifications.find(n => n.id === id);
+    if (n) n.read = true;
+    renderNotifications();
+  }
+
+  // Clic sur une notification : 1) elle est marquée comme lue (le badge se met à jour),
+  // 2) on navigue vers son contenu réel en réutilisant les fonctions existantes
+  // (showEvent, showListing, showPage...). Le bouton Retour ramène ensuite à Notifications.
+  function openNotification(id) {
+    const n = notifications.find(n => n.id === id);
+    if (!n) return;
+    markNotificationRead(id);
+    const tg = n.target;
+    if (!tg) return;
+    if (tg.type === 'event') showEvent(tg.index);
+    else if (tg.type === 'listing') showListing(tg.index);
+    else if (tg.type === 'post') openPostFromNotification(tg.id);
+    else if (tg.type === 'courses') showPage('cours');
+  }
+
+  // Ouvre Communauté sur la publication concernée : elle est mise en évidence,
+  // on fait défiler jusqu'à elle et ses commentaires sont ouverts.
+  // Si la publication n'existe plus (supprimée), on ouvre simplement Communauté.
+  function openPostFromNotification(postId) {
+    let post = null;
+    if (postId !== null && postId !== undefined) {
+      post = posts.find(p => p.id === postId);
+    } else {
+      // Notification générique : la publication la plus récente de l'utilisatrice,
+      // sinon la première du fil.
+      post = posts.find(p => p.isMine) || posts[0];
+    }
+    showPage('communaute');
+    if (!post) return;
+    openCommentPostId = post.id;
+    openMenuPostId = null;
+    editingPostId = null;
+    refreshPosts();
+    const el = document.querySelector('#postsContainer [data-post-id="' + post.id + '"]');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('post-highlight');
+      setTimeout(() => el.classList.remove('post-highlight'), 2500);
+    }
+  }
+
+  function deleteNotification(id) {
+    notifications = notifications.filter(n => n.id !== id);
+    renderNotifications();
+  }
+
+  /* ===== TABLEAU DE BORD ACCUEIL ===== */
+  function renderDashboard() {
+    document.getElementById('dashboardName').textContent = profileData.name.split(' ')[0];
+
+    // Logements récents (les 2 premiers de la liste)
+    let housingHtml = '';
+    listings.slice(0, 2).forEach((l, index) => {
+      housingHtml += '<div class="dash-mini-row" onclick="event.stopPropagation(); showListing(' + index + ')">' +
+        '<span>' + l.title[currentLang] + '</span>' +
+        '<span class="dash-mini-price">' + l.price[currentLang] + '</span>' +
+      '</div>';
+    });
+    document.getElementById('dashHousingMini').innerHTML = housingHtml;
+
+    // Prochains événements (les 2 premiers de la liste)
+    let eventsHtml = '';
+    events.slice(0, 2).forEach((e, index) => {
+      eventsHtml += '<div class="dash-mini-row" onclick="event.stopPropagation(); showEvent(' + index + ')">' +
+        '<span>' + e.title[currentLang] + '</span>' +
+        '<span class="dash-mini-price">' + e.dayNum + ' ' + e.mon[currentLang] + '</span>' +
+      '</div>';
+    });
+    document.getElementById('dashEventsMini').innerHTML = eventsHtml;
+
+    document.getElementById('dashFavCount').textContent = favoriteListingIndices.length;
+    document.getElementById('dashNotifCount').textContent = getUnreadNotifCount();
+  }
+
+  /* ===== COMMUNAUTE : publications, likes, commentaires ===== */
+  // Les 2 publications de démo ont un texte bilingue (fr/en). Les publications
+  // créées par l'utilisateur restent dans la langue où elles ont été écrites,
+  // comme dans une vraie appli.
+  // Les groupes communautaires (données réutilisées à la fois par les cartes
+  // de la page Communauté et par la page de détail d'un groupe).
+  const groups = [
+    { key: "genie", name: { fr: "Génie logiciel", en: "Software Engineering" }, members: 128 },
+    { key: "stats", name: { fr: "Statistiques", en: "Statistics" }, members: 64 },
+    { key: "sport", name: { fr: "Sport campus", en: "Campus Sports" }, members: 95 }
+  ];
+  let currentGroupKey = null;
+
+  let posts = [
+    {
+      id: 1, name: "Marc-Antoine", avatarBg: "bg-blue", avatarText: "text-blue", isMine: false, group: "genie",
+      meta: { fr: "Génie logiciel · il y a 2h", en: "Software Engineering · 2h ago" },
+      content: { fr: "Quelqu'un pour former un groupe d'étude avant l'examen d'algo jeudi ?", en: "Anyone up for a study group before Thursday's algo exam?" },
+      likes: 12, likedByMe: false, comments: []
+    },
+    {
+      id: 2, name: "Sarah L.", avatarBg: "bg-red", avatarText: "text-red", isMine: false, group: "sport",
+      meta: { fr: "Sport campus · il y a 5h", en: "Campus Sports · 5h ago" },
+      content: { fr: "Match amical de volleyball samedi au pavillon sportif, tout le monde bienvenu !", en: "Friendly volleyball match Saturday at the sports building, everyone welcome!" },
+      likes: 27, likedByMe: false, comments: []
+    }
+  ];
+  let nextPostId = 3;
+  let openCommentPostId = null;
+  let openMenuPostId = null;
+  let editingPostId = null;
+
+  function getPostMeta(p) {
+    return (typeof p.meta === 'object') ? p.meta[currentLang] : p.meta;
+  }
+  function getPostContent(p) {
+    return (typeof p.content === 'object') ? p.content[currentLang] : p.content;
+  }
+
+  // Empêche qu'un texte tapé par l'utilisateur casse l'affichage (balises HTML, etc.)
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // Construit le HTML d'UNE publication. Réutilisé par le fil principal (Communauté)
+  // ET par la page de détail d'un groupe : un seul système, pas de doublon.
+  function buildPostHtml(p) {
+    const commentsHtml = p.comments.map(c =>
+      '<p class="comment-item"><b>' + escapeHtml(c.name) + ':</b> ' + escapeHtml(c.text) + '</p>'
+    ).join('');
+    const showComments = openCommentPostId === p.id;
+    const showMenu = openMenuPostId === p.id;
+    const isEditing = editingPostId === p.id;
+
+    const youTag = p.isMine ? ' <span class="you-tag">' + t('you_tag') + '</span>' : '';
+    const menuBtn = p.isMine ? '<span class="post-menu-btn" onclick="togglePostMenu(' + p.id + ')">&#8942;</span>' : '';
+    const menuHtml = (p.isMine && showMenu) ?
+      '<div class="post-menu">' +
+        '<div onclick="startEditPost(' + p.id + ')">✏️ ' + t('edit_post_btn') + '</div>' +
+        '<div onclick="deletePost(' + p.id + ')">🗑️ ' + t('delete_post_btn') + '</div>' +
+      '</div>' : '';
+
+    const bodyHtml = isEditing ?
+      '<textarea class="edit-post-textarea" id="editPostInput-' + p.id + '" rows="2">' + escapeHtml(getPostContent(p)) + '</textarea>' +
+      '<div class="edit-post-actions">' +
+        '<button class="publish-btn" onclick="saveEditedPost(' + p.id + ')">' + t('save_btn') + '</button>' +
+        '<button class="secondary-btn" onclick="cancelEditPost()">' + t('cancel_btn') + '</button>' +
+      '</div>'
+      : '<p class="body">' + escapeHtml(getPostContent(p)) + '</p>';
+
+    const actionsHtml = isEditing ? '' :
+      '<div class="post-actions">' +
+        '<span class="' + (p.likedByMe ? 'liked' : '') + '" onclick="togglePostLike(' + p.id + ')"><i class="ti ti-heart"></i> ' + p.likes + '</span>' +
+        '<span onclick="toggleCommentBox(' + p.id + ')"><i class="ti ti-message-circle"></i> ' + p.comments.length + '</span>' +
+      '</div>' +
+      (showComments ?
+        '<div class="comment-section">' + commentsHtml +
+          '<div class="comment-input-row">' +
+            '<input type="text" id="commentInput-' + p.id + '" placeholder="' + t('write_comment_placeholder') + '">' +
+            '<button onclick="addComment(' + p.id + ')">' + t('comment_send_btn') + '</button>' +
+          '</div>' +
+        '</div>'
+      : '');
+
+    return '<div class="post" data-post-id="' + p.id + '">' +
+      '<div class="post-head"><div class="avatar ' + p.avatarBg + '"><i class="ti ti-user ' + p.avatarText + '"></i></div>' +
+      '<div style="flex:1;"><p class="name">' + escapeHtml(p.name) + youTag + '</p><p class="meta">' + escapeHtml(getPostMeta(p)) + '</p></div>' +
+      menuBtn + '</div>' +
+      menuHtml + bodyHtml + actionsHtml +
+    '</div>';
+  }
+
+  function renderPosts() {
+    const container = document.getElementById('postsContainer');
+    container.innerHTML = posts.map(buildPostHtml).join('');
+  }
+
+  // Réaffiche le fil principal ET la page de groupe ouverte (le cas échéant),
+  // puisque les deux affichent le même tableau "posts".
+  function refreshPosts() {
+    renderPosts();
+    if (currentGroupKey) renderGroupPosts();
+  }
+
+  function renderGroupPosts() {
+    const groupPosts = posts.filter(p => p.group === currentGroupKey);
+    document.getElementById('groupPostsContainer').innerHTML = groupPosts.map(buildPostHtml).join('');
+    document.getElementById('groupNoPostsMsg').style.display = groupPosts.length === 0 ? 'block' : 'none';
+  }
+
+  function showGroupDetail(key) {
+    currentGroupKey = key;
+    const g = groups.find(x => x.key === key);
+    document.getElementById('groupDetailName').textContent = g.name[currentLang];
+    document.getElementById('groupDetailMembers').textContent = g.members + ' ' + t('members_word');
+    openCommentPostId = null;
+    openMenuPostId = null;
+    editingPostId = null;
+    renderGroupPosts();
+    showPage('group-detail');
+  }
+
+  function publishGroupPost() {
+    const input = document.getElementById('groupNewPostInput');
+    const text = input.value.trim();
+    if (text === '') return;
+    posts.unshift({
+      id: nextPostId++, name: profileData.name, avatarBg: 'bg-blue', avatarText: 'text-blue', isMine: true, group: currentGroupKey,
+      meta: t('just_now'), content: text, likes: 0, likedByMe: false, comments: []
+    });
+    input.value = '';
+    refreshPosts();
+  }
+
+  function publishPost() {
+    const input = document.getElementById('newPostInput');
+    const text = input.value.trim();
+    if (text === '') return;
+    posts.unshift({
+      id: nextPostId++, name: profileData.name, avatarBg: 'bg-blue', avatarText: 'text-blue', isMine: true, group: null,
+      meta: t('just_now'), content: text, likes: 0, likedByMe: false, comments: []
+    });
+    input.value = '';
+    refreshPosts();
+  }
+
+  function togglePostLike(id) {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+    post.likedByMe = !post.likedByMe;
+    post.likes += post.likedByMe ? 1 : -1;
+    refreshPosts();
+  }
+
+  function toggleCommentBox(id) {
+    openCommentPostId = (openCommentPostId === id) ? null : id;
+    refreshPosts();
+  }
+
+  function addComment(id) {
+    const input = document.getElementById('commentInput-' + id);
+    const text = input.value.trim();
+    if (text === '') return;
+    const post = posts.find(p => p.id === id);
+    post.comments.push({ name: profileData.name, text: text });
+    refreshPosts();
+    addNotification(
+      'Quelqu\'un a commenté votre publication.',
+      'Someone commented on your post.',
+      { type: 'post', id: id }
+    );
+  }
+
+  // ----- Gestion des PROPRES publications (modifier / supprimer) -----
+  // Sécurité : chaque fonction vérifie post.isMine avant d'agir, donc une
+  // publication d'un autre utilisateur ne peut jamais être modifiée/supprimée
+  // (le bouton ⋯ n'apparaît même pas pour elles dans buildPostHtml).
+  function togglePostMenu(id) {
+    const post = posts.find(p => p.id === id);
+    if (!post || !post.isMine) return;
+    openMenuPostId = (openMenuPostId === id) ? null : id;
+    refreshPosts();
+  }
+
+  function startEditPost(id) {
+    const post = posts.find(p => p.id === id);
+    if (!post || !post.isMine) return;
+    editingPostId = id;
+    openMenuPostId = null;
+    refreshPosts();
+  }
+
+  function cancelEditPost() {
+    editingPostId = null;
+    refreshPosts();
+  }
+
+  function saveEditedPost(id) {
+    const post = posts.find(p => p.id === id);
+    if (!post || !post.isMine) return;
+    const input = document.getElementById('editPostInput-' + id);
+    const newText = input.value.trim();
+    if (newText === '') return;
+    post.content = newText;
+    editingPostId = null;
+    refreshPosts();
+  }
+
+  // Étape 1 : clic sur "Supprimer" dans le menu ⋯ -> on ferme le menu et on
+  // ouvre NOTRE fenêtre de confirmation (pas la boîte native confirm(), qui est
+  // souvent bloquée dans les aperçus intégrés et faisait échouer la suppression).
+  let pendingDeletePostId = null;
+
+  function deletePost(id) {
+    const post = posts.find(p => p.id === id);
+    if (!post || !post.isMine) return;
+    pendingDeletePostId = id;
+    openMenuPostId = null;
+    refreshPosts();
+    document.getElementById('deleteConfirmOverlay').style.display = 'flex';
+  }
+
+  // Étape 2a : l'utilisatrice confirme -> suppression réelle dans le tableau "posts"
+  function confirmDeletePost() {
+    const post = posts.find(p => p.id === pendingDeletePostId);
+    if (post && post.isMine) {
+      posts = posts.filter(p => p.id !== pendingDeletePostId);
+    }
+    pendingDeletePostId = null;
+    openMenuPostId = null;
+    document.getElementById('deleteConfirmOverlay').style.display = 'none';
+    refreshPosts();
+  }
+
+  // Étape 2b : l'utilisatrice annule -> rien n'est supprimé, on ferme la fenêtre
+  function cancelDeletePost() {
+    pendingDeletePostId = null;
+    document.getElementById('deleteConfirmOverlay').style.display = 'none';
+  }
+
+  function joinGroup() {
+    const btn = document.getElementById('joinBtn');
+    if (!btn.classList.contains('joined')) {
+      btn.classList.add('joined');
+      document.getElementById('joinBtnText').textContent = t('join_btn_sent');
+    }
+  }
+
+  function toggleHeart() {
+    toggleFavoriteListing(currentListingIndex);
+  }
+
+  function contactOwner() {
+    const btn = document.getElementById('contactBtn');
+    if (!btn.classList.contains('sent')) {
+      btn.classList.add('sent');
+      btn.textContent = t('contact_btn_sent');
+    }
+  }
+
+  /* ===== EVENEMENTS ===== */
+  const events = [
+    {
+      dayNum: 25, mon: { fr: "Sept", en: "Sep" },
+      listMeta: { fr: "17h00 · Pavillon A", en: "5:00 PM · Building A" },
+      category: { fr: "Mon programme", en: "My program" }, categoryKey: "program",
+      title: { fr: "5 à 7 - Génie logiciel", en: "Networking - Software Engineering" },
+      date: { fr: "Jeudi 25 septembre 2026", en: "Thursday, September 25, 2026" },
+      time: { fr: "17h00 - 19h00", en: "5:00 PM - 7:00 PM" },
+      location: { fr: "Pavillon A, salle commune", en: "Building A, common room" },
+      desc: {
+        fr: "Viens réseauter avec les étudiants et diplômés du programme autour de bouchées et boissons non-alcoolisées.",
+        en: "Come network with students and alumni of the program over snacks and non-alcoholic drinks."
+      },
+      attendees: 42
+    },
+    {
+      dayNum: 27, mon: { fr: "Sept", en: "Sep" },
+      listMeta: { fr: "10h00 · Bibliothèque", en: "10:00 AM · Library" },
+      category: { fr: "Étude", en: "Study" }, categoryKey: "study",
+      title: { fr: "Groupe d'étude - Statistiques", en: "Study group - Statistics" },
+      date: { fr: "Samedi 27 septembre 2026", en: "Saturday, September 27, 2026" },
+      time: { fr: "10h00 - 12h00", en: "10:00 AM - 12:00 PM" },
+      location: { fr: "Bibliothèque, salle 204", en: "Library, room 204" },
+      desc: {
+        fr: "Révision en groupe avant l'examen de mi-session. Apporte tes notes et tes questions, on répond ensemble.",
+        en: "Group review before the midterm exam. Bring your notes and questions, we'll go through them together."
+      },
+      attendees: 15
+    },
+    {
+      dayNum: 3, mon: { fr: "Oct", en: "Oct" },
+      listMeta: { fr: "14h00 · Pavillon sportif", en: "2:00 PM · Sports building" },
+      category: { fr: "Sportif", en: "Sports" }, categoryKey: "sport",
+      title: { fr: "Match de volleyball amical", en: "Friendly volleyball match" },
+      date: { fr: "Samedi 3 octobre 2026", en: "Saturday, October 3, 2026" },
+      time: { fr: "14h00 - 16h00", en: "2:00 PM - 4:00 PM" },
+      location: { fr: "Pavillon sportif, gymnase 2", en: "Sports building, gym 2" },
+      desc: {
+        fr: "Match amical ouvert à tous les niveaux, aucune inscription requise. Vient avec des espadrilles de gymnase.",
+        en: "Friendly match open to all levels, no registration required. Bring indoor gym shoes."
+      },
+      attendees: 24
+    }
+  ];
+
+  let currentEventIndex = 0;
+  const rsvpStatus = [false, false, false];
+  let eventFavorites = [];
+
+  function isEventFavorite(index) {
+    return eventFavorites.includes(index);
+  }
+
+  function toggleFavoriteEvent(index, event) {
+    if (event) event.stopPropagation();
+    const pos = eventFavorites.indexOf(index);
+    if (pos === -1) {
+      eventFavorites.push(index);
+      const e = events[index];
+      addNotification(
+        'L\'événement « ' + e.title.fr + ' » a été ajouté à vos favoris.',
+        'The event "' + e.title.en + '" was added to your favorites.',
+        { type: 'event', index: index }
+      );
+    } else {
+      eventFavorites.splice(pos, 1);
+    }
+    renderEventsList();
+    renderFavoriteEventsList();
+    if (currentEventIndex === index) {
+      document.getElementById('eventHeartBtn').classList.toggle('liked', isEventFavorite(index));
+    }
+  }
+
+  // Construit le HTML d'une carte événement (utilisé pour la liste ET pour Mes événements)
+  function buildEventCardHtml(e, index) {
+    const likedClass = isEventFavorite(index) ? 'liked' : '';
+    return '<button class="event-card" onclick="showEvent(' + index + ')">' +
+      '<span class="card-heart-btn ' + likedClass + '" onclick="toggleFavoriteEvent(' + index + ', event)"><i class="ti ti-heart"></i></span>' +
+      '<div class="event-date"><span class="day">' + e.dayNum + '</span><span class="mon">' + e.mon[currentLang] + '</span></div>' +
+      '<div class="info">' +
+        '<p class="title">' + e.title[currentLang] + '</p>' +
+        '<p class="meta"><i class="ti ti-clock"></i> ' + e.listMeta[currentLang] + '</p>' +
+        '<span class="event-tag">' + e.category[currentLang] + '</span>' +
+      '</div>' +
+    '</button>';
+  }
+
+  let currentEventCategoryFilter = 'all';
+
+  function setEventCategoryFilter(cat) {
+    currentEventCategoryFilter = cat;
+    document.querySelectorAll('#eventsCategoryFilters .filter-chip').forEach(chip => {
+      chip.classList.toggle('active', chip.dataset.cat === cat);
+    });
+    renderEventsList();
+  }
+
+  function renderEventsList() {
+    const container = document.getElementById('eventsListContainer');
+    let html = '';
+    events.forEach((e, index) => {
+      if (currentEventCategoryFilter !== 'all' && e.categoryKey !== currentEventCategoryFilter) return;
+      html += buildEventCardHtml(e, index);
+    });
+    container.innerHTML = html;
+    renderMyEventsList();
+  }
+
+  function renderMyEventsList() {
+    const container = document.getElementById('myEventsListContainer');
+    const emptyMsg = document.getElementById('myEventsEmptyMsg');
+    let html = '';
+    let count = 0;
+    events.forEach((e, index) => {
+      if (rsvpStatus[index]) { html += buildEventCardHtml(e, index); count++; }
+    });
+    container.innerHTML = html;
+    emptyMsg.style.display = count === 0 ? 'block' : 'none';
+  }
+
+  function renderEventText(index) {
+    const e = events[index];
+    document.getElementById('eCat').textContent = e.category[currentLang];
+    document.getElementById('eTitle').textContent = e.title[currentLang];
+    document.getElementById('eDate').textContent = e.date[currentLang];
+    document.getElementById('eTime').textContent = e.time[currentLang];
+    document.getElementById('eLocation').textContent = e.location[currentLang];
+    document.getElementById('eDesc').textContent = e.desc[currentLang];
+    document.getElementById('eventHeartBtn').classList.toggle('liked', isEventFavorite(index));
+  }
+
+  function showEvent(index) {
+    currentEventIndex = index;
+    renderEventText(index);
+    updateRsvpDisplay();
+    showPage('evenement-detail');
+  }
+
+  function updateRsvpDisplay() {
+    const btn = document.getElementById('rsvpBtn');
+    const count = document.getElementById('attendeesCount');
+    const e = events[currentEventIndex];
+    const going = rsvpStatus[currentEventIndex];
+    const total = e.attendees + (going ? 1 : 0);
+    count.textContent = total + ' ' + t('participants_word');
+    btn.classList.toggle('going', going);
+    btn.textContent = going ? t('rsvp_btn_going') : t('rsvp_btn');
+  }
+
+  // "Retirer sa participation" = recliquer sur "Je participe" (toggle dans les deux sens)
+  function toggleRsvp() {
+    rsvpStatus[currentEventIndex] = !rsvpStatus[currentEventIndex];
+    updateRsvpDisplay();
+    renderMyEventsList();
+    if (rsvpStatus[currentEventIndex]) {
+      const e = events[currentEventIndex];
+      addNotification(
+        'Vous participez maintenant à « ' + e.title.fr + ' ».',
+        'You are now attending "' + e.title.en + '".',
+        { type: 'event', index: currentEventIndex }
+      );
+    }
+  }
+
+  /* ===== CONNEXION / INSCRIPTION : bascule entre les 2 formulaires ===== */
+  function switchAuthTab(tab) {
+    const isLogin = tab === 'login';
+    document.getElementById('authTabLogin').classList.toggle('active', isLogin);
+    document.getElementById('authTabSignup').classList.toggle('active', !isLogin);
+    document.getElementById('loginFields').style.display = isLogin ? 'block' : 'none';
+    document.getElementById('signupFields').style.display = isLogin ? 'none' : 'block';
+    document.getElementById('loginError').style.display = 'none';
+    document.getElementById('signupError').style.display = 'none';
+    document.getElementById('loginSuccess').style.display = 'none';
+    document.getElementById('signupSuccess').style.display = 'none';
+  }
+
+  function forgotPassword() {
+    alert(t('forgot_password_alert'));
+  }
+
+  // Affiche la vue "Mot de passe oublié" et cache le reste (onglets, connexion, inscription)
+  function showForgotView() {
+    document.getElementById('authTabs').style.display = 'none';
+    document.getElementById('loginFields').style.display = 'none';
+    document.getElementById('signupFields').style.display = 'none';
+    document.getElementById('loginError').style.display = 'none';
+    document.getElementById('signupError').style.display = 'none';
+    document.getElementById('loginSuccess').style.display = 'none';
+    document.getElementById('signupSuccess').style.display = 'none';
+    document.getElementById('forgotError').style.display = 'none';
+    document.getElementById('forgotSuccess').style.display = 'none';
+    document.getElementById('forgotFields').style.display = 'block';
+  }
+
+  // Ramène à l'écran de connexion normal
+  function backToLogin() {
+    document.getElementById('forgotFields').style.display = 'none';
+    document.getElementById('forgotSuccess').style.display = 'none';
+    document.getElementById('authTabs').style.display = 'flex';
+    switchAuthTab('login');
+  }
+
+  // IMPORTANT : simulation seulement. Aucun email n'est réellement envoyé,
+  // et aucun vrai compte n'est vérifié (pas de base de données pour le moment).
+  function validateForgotPassword() {
+    const email = document.getElementById('forgotEmailInput').value.trim();
+    const errorBox = document.getElementById('forgotError');
+
+    if (email === '') {
+      errorBox.innerHTML = '<b>' + t('error_intro') + '</b><ul><li>' + t('err_email') + '</li></ul>';
+      errorBox.style.display = 'block';
+      return;
+    }
+    if (!email.includes('@') || !email.includes('.')) {
+      errorBox.innerHTML = '<b>' + t('error_intro') + '</b><ul><li>' + t('err_email_format') + '</li></ul>';
+      errorBox.style.display = 'block';
+      return;
+    }
+
+    errorBox.style.display = 'none';
+    document.getElementById('forgotFields').style.display = 'none';
+    document.getElementById('forgotSuccess').style.display = 'block';
+  }
+
+  // IMPORTANT : ceci est une simulation. Il n'y a pas encore de base de données,
+  // donc on ne peut pas vérifier un vrai mot de passe. On vérifie seulement que
+  // les champs sont bien remplis et que l'email a un format valide.
+  function validateLogin() {
+    const email = document.getElementById('loginEmailInput').value.trim();
+    const password = document.getElementById('loginPasswordInput').value;
+
+    const errors = [];
+    if (email === '') {
+      errors.push(t('err_email'));
+    } else if (!email.includes('@') || !email.includes('.')) {
+      errors.push(t('err_email_format'));
+    }
+    if (password === '') errors.push(t('err_password'));
+
+    const errorBox = document.getElementById('loginError');
+    if (errors.length > 0) {
+      errorBox.innerHTML = '<b>' + t('error_intro') + '</b><ul>' +
+        errors.map(e => '<li>' + e + '</li>').join('') + '</ul>';
+      errorBox.style.display = 'block';
+      return;
+    }
+
+    errorBox.style.display = 'none';
+    document.getElementById('loginFields').style.display = 'none';
+    document.getElementById('loginSuccess').style.display = 'block';
+  }
+
+  /* ===== INSCRIPTION ===== */
+  let selectedPrefLang = 'fr';
+
+  function selectPrefLang(lang) {
+    selectedPrefLang = lang;
+    document.getElementById('prefLangFrBtn').classList.toggle('selected', lang === 'fr');
+    document.getElementById('prefLangEnBtn').classList.toggle('selected', lang === 'en');
+  }
+
+  async function validateSignup() {
+    const fullName = document.getElementById('fullNameInput').value.trim();
+    const email = document.getElementById('emailInput').value.trim();
+    const school = document.getElementById('schoolInput').value.trim();
+    const program = document.getElementById('programInput').value.trim();
+    const password = document.getElementById('passwordInput').value;
+
+    const errors = [];
+    if (fullName === '') errors.push(t('err_fullname'));
+    if (email === '') {
+      errors.push(t('err_email'));
+    } else if (!email.includes('@') || !email.includes('.')) {
+      errors.push(t('err_email_format'));
+    }
+    if (school === '') errors.push(t('err_school'));
+    if (program === '') errors.push(t('err_program'));
+    if (password === '') {
+      errors.push(t('err_password'));
+    } else if (password.length < 6) {
+      errors.push(t('err_password_short'));
+    }
+
+    const errorBox = document.getElementById('signupError');
+    if (errors.length > 0) {
+      // On affiche la liste des erreurs, sans jamais montrer le mot de passe tapé
+      errorBox.innerHTML = '<b>' + t('error_intro') + '</b><ul>' +
+        errors.map(e => '<li>' + e + '</li>').join('') + '</ul>';
+      errorBox.style.display = 'block';
+      errorBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    // Pas d'erreur : on cache le formulaire et on affiche le succès
+    // (Note pour plus tard : ici on enverra les infos à une vraie base de données.
+    //  Pour l'instant, rien n'est sauvegardé et le mot de passe n'est jamais stocké.)
+    errorBox.style.display = 'none';
+    document.getElementById('signupFields').style.display = 'none';
+    const { data, error } = await supabase.auth.signUp({
+
+email: email,
+
+password: password,
+
+options: {
+
+data: {
+
+full_name: fullName,
+
+school: school,
+
+program: program
+
+}
+
+}
+
+});
+
+
+
+if (error) {
+
+errorBox.innerHTML = error.message;
+
+errorBox.style.display = 'block';
+
+return;
+
+}
+
+
+
+document.getElementById('signupSuccess').style.display = 'block'; 
+
+  }
+  function completeSignup() {
+    // Si l'utilisatrice a choisi anglais comme langue préférée, on bascule l'appli
+    if (selectedPrefLang !== currentLang) {
+      toggleLanguage();
+    }
+    showPage('accueil');
+  }
+
+  /* ===== INITIALISATION AU CHARGEMENT DE LA PAGE ===== */
+  // On construit le menu des quartiers et on affiche la liste des logements
+  // dès l'ouverture de l'application (avant même que l'utilisateur clique sur Logements).
+  populateNeighborhoodOptions();
+  renderHousingList();
+  renderFavoritesList();
+  renderEventsList();
+  renderFavoriteEventsList();
+  renderPosts();
+  renderNotifications();
+  renderDashboard();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+
+<script>
+
+const SUPABASE_URL = "https://knrdyzzxpplqspwtnbuc.supabase.co";
+
+const SUPABASE_ANON_KEY = "sb_publishable_LAIF7vzTAazwXxW2yUEdRA_BcZL-jzO";
+
+
+
+const supabaseClient = window.supabase.createClient(
+
+SUPABASE_URL,
+
+SUPABASE_ANON_KEY
+
+);
+
+</script> 
+
+
+</body>
+</html>
