@@ -4,24 +4,24 @@ StudLife est une application étudiante conçue pour aider les étudiants à mie
 
 ---
 
-## 🎯 Objectif
+##  Objectif
 
 L’objectif de StudLife est de réunir plusieurs services utiles aux étudiants au sein d'une seule application centralisée.
 
 ---
 
-## ✨ Fonctionnalités Principales
+##  Fonctionnalités Principales
 
-* 🏠 **Logement** — Rechercher des logements et des opportunités de colocation.
-* 👥 **Communauté** — Échanger et créer des liens avec d’autres étudiants.
-* 📅 **Événements** — Découvrir des événements universitaires et festifs adaptés.
-* 💬 **Assistant IA** — Obtenir des réponses rapides à des questions grâce à un LLM.
-* 🔔 **Notifications** — Recevoir des rappels et des informations importantes en temps réel.
-* 👤 **Profil** — Gérer ses préférences et ses informations personnelles.
+*  **Logement** — Rechercher des logements et des opportunités de colocation.
+*  **Communauté** — Échanger et créer des liens avec d’autres étudiants.
+*  **Événements** — Découvrir des événements universitaires et festifs adaptés.
+*  **Assistant IA** — Obtenir des réponses rapides à des questions grâce à un LLM.
+*  **Notifications** — Recevoir des rappels et des informations importantes en temps réel.
+*  **Profil** — Gérer ses préférences et ses informations personnelles.
 
 ---
 
-## 🤖 Intelligence Artificielle
+##  Intelligence Artificielle
 
 StudLife place l'expérience étudiante au centre du projet. L’intelligence artificielle est intégrée de manière fluide comme assistant conversationnel (basé sur un Large Language Model).
 
@@ -31,7 +31,7 @@ L’assistant est conçu pour :
 
 ---
 
-## 🛠️ Stack Technique
+##  Stack Technique
 
 * **Front-end :** HTML, CSS, JavaScript
 * **Back-end & Base de données :** Supabase
@@ -39,14 +39,14 @@ L’assistant est conçu pour :
 
 ---
 
-## 📁 Prototype
+##  Prototype
 
 Le prototype initial est disponible directement dans le dépôt :
 * `Studlife_Prototype_v1.html`
 
 ---
 
-## 🚀 État du Projet & Feuilles de Route
+##  État du Projet & Feuilles de Route
 
 Le projet est actuellement en **phase de prototypage et de développement**.
 
@@ -59,4 +59,4 @@ Le projet est actuellement en **phase de prototypage et de développement**.
 
 ---
 
-👩‍💻 **StudLife** — *Student Community Application*
+ **StudLife** — *Student Community Application*
