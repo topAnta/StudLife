@@ -2,13 +2,13 @@
 
 StudLife est une application étudiante conçue pour aider les étudiants à mieux s’intégrer dans leur environnement scolaire et social.
 
----
+
 
 ##  Objectif
 
 L’objectif de StudLife est de réunir plusieurs services utiles aux étudiants au sein d'une seule application centralisée.
 
----
+
 
 ##  Fonctionnalités Principales
 
@@ -19,7 +19,7 @@ L’objectif de StudLife est de réunir plusieurs services utiles aux étudiants
 *  **Notifications** — Recevoir des rappels et des informations importantes en temps réel.
 *  **Profil** — Gérer ses préférences et ses informations personnelles.
 
----
+
 
 ##  Intelligence Artificielle
 
