@@ -1,4 +1,4 @@
-# StudLife 🎓
+# StudLife 
 
 StudLife est une application étudiante conçue pour aider les étudiants à mieux s’intégrer dans leur environnement scolaire et social.
 
