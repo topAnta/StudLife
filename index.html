@@ -2130,47 +2130,58 @@
   }
 
  async function validateSignup() {
-    const fullName = document.getElementById('fullNameInput').value;
-    const email = document.getElementById('emailInput').value;
-    const school = document.getElementById('schoolInput').value;
-    const program = document.getElementById('programInput').value;
+    const fullName = document.getElementById('fullNameInput').value.trim();
+    const email    = document.getElementById('emailInput').value.trim();
+    const school   = document.getElementById('schoolInput').value.trim();
+    const program  = document.getElementById('programInput').value.trim();
     const password = document.getElementById('passwordInput').value;
-    const errorBox = document.getElementById('errorBox');
+    const errorBox = document.getElementById('signupError');
+
+    const errors = [];
+    if (!fullName) errors.push(t('err_fullname'));
+    if (!email) errors.push(t('err_email'));
+    else if (!email.includes('@') || !email.includes('.')) errors.push(t('err_email_format'));
+    if (!school) errors.push(t('err_school'));
+    if (!program) errors.push(t('err_program'));
+    if (!password) errors.push(t('err_password'));
+    else if (password.length < 6) errors.push(t('err_password_short'));
+
+    if (errors.length > 0) {
+      errorBox.innerHTML = '<b>' + t('error_intro') + '</b><ul>' +
+        errors.map(e => '<li>' + e + '</li>').join('') + '</ul>';
+      errorBox.style.display = 'block';
+      return;
+    }
+    errorBox.style.display = 'none';
 
     try {
-        const { data, error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-            options: {
-                data: {
-                    full_name: fullName,
-                    school: school,
-                    program: program
-                }
-            }
-        });
+      const { data, error } = await sb.auth.signUp({
+        email, password,
+        options: { data: { full_name: fullName, school, program, language: selectedPrefLang } }
+      });
+      if (error) {
+        errorBox.textContent = error.message;
+        errorBox.style.display = 'block';
+        return;
+      }
+      profileData.name = fullName;
+      profileData.school = school;
+      profileData.program = program;
+      profileData.language = selectedPrefLang;
+      renderProfileDisplay();
 
-        if (error) {
-            if (errorBox) {
-                errorBox.innerHTML = error.message;
-                errorBox.style.display = 'block';
-            }
-            return;
-        }
-
-        const successBlock = document.getElementById('signupSuccess');
-        if (successBlock) {
-            successBlock.style.display = 'block';
-        }
-
+      document.getElementById('signupFields').style.display = 'none';
+      document.getElementById('signupSuccess').style.display = 'block';
     } catch (err) {
-        console.error("Erreur lors de l'inscription :", err);
+      console.error("Erreur lors de l'inscription :", err);
+      errorBox.textContent = "Erreur réseau, réessaie.";
+      errorBox.style.display = 'block';
     }
-}
+  }
 
 function completeSignup() {
     // Si l'utilisatrice a choisi anglais comme langue préférée, on bascule l'appli
-    if (selectedPreflang !== currentLang) {
+    if (selectedPrefLang !== currentLang) {
         toggleLanguage();
     }
     showPage('accueil');
@@ -2197,7 +2208,7 @@ renderDashboard();
     const SUPABASE_URL = "https://knrdyzzxpplqspwtnbuc.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_LAIF7vzTAazwXxW2yUEdRA_BcZL-jzO";
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </script>
 
 </body>
