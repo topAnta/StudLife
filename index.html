@@ -2130,137 +2130,63 @@
   }
 
  async function validateSignup() {
-  const fullName = document.getElementById('fullNameInput').value.trim();
-  const email = document.getElementById('emailInput').value.trim();
-  const school = document.getElementById('schoolInput').value.trim();
-  const program = document.getElementById('programInput').value.trim();
-  const password = document.getElementById('passwordInput').value;
+    const fullName = document.getElementById('fullNameInput').value;
+    const email = document.getElementById('emailInput').value;
+    const school = document.getElementById('schoolInput').value;
+    const program = document.getElementById('programInput').value;
+    const password = document.getElementById('passwordInput').value;
+    const errorBox = document.getElementById('errorBox');
 
-  const errors = [];
-  if (fullName === '') errors.push(t('err_fullname'));
-  if (email === '') {
-    errors.push(t('err_email'));
-  } else if (!email.includes('@') || !email.includes('.')) {
-    errors.push(t('err_email_format'));
-  }
-  if (school === '') errors.push(t('err_school'));
-  if (program === '') errors.push(t('err_program'));
-  if (password === '') {
-    errors.push(t('err_password'));
-  } else if (password.length < 6) {
-    errors.push(t('err_password_short'));
-  }
+    try {
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    full_name: fullName,
+                    school: school,
+                    program: program
+                }
+            }
+        });
 
-  const errorBox = document.getElementById('signupError');
-
-  if (errors.length > 0) {
-    if (errorBox) {
-      errorBox.innerHTML = '<b>' + t('error_intro') + '</b><ul>' + 
-        errors.map(e => '<li>' + e + '</li>').join('') + '</ul>';
-      errorBox.style.display = 'block';
-      errorBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  } else {
-    if (errorBox) errorBox.style.display = 'none';
-
-    // 1. Inscription Supabase
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          full_name: fullName,
-          school: school,
-          program: program
+        if (error) {
+            if (errorBox) {
+                errorBox.innerHTML = error.message;
+                errorBox.style.display = 'block';
+            }
+            return;
         }
-      }
-    });
 
-    if (error) {
-      if (errorBox) {
-        errorBox.textContent = error.message;
-        errorBox.style.display = 'block';
-      }
-    } else {
-      // 2. Mise à jour dynamique de la carte de profil
-      const profileName = document.getElementById('profileName');
-      const profileSchool = document.getElementById('profileSchool');
-      const profileProgram = document.getElementById('profileProgram');
+        const successBlock = document.getElementById('signupSuccess');
+        if (successBlock) {
+            successBlock.style.display = 'block';
+        }
 
-      if (profileName) profileName.textContent = fullName;
-      if (profileSchool) profileSchool.textContent = school;
-      if (profileProgram) profileProgram.textContent = program;
-
-      // 3. Affichage du profil
-      if (typeof showSection === 'function') {
-        showSection('profile');
-      }
+    } catch (err) {
+        console.error("Erreur lors de l'inscription :", err);
     }
-  }
-}
-    // Pas d'erreur : on cache le formulaire et on affiche le succès
-    // (Note pour plus tard : ici on enverra les infos à une vraie base de données.
-    //  Pour l'instant, rien n'est sauvegardé et le mot de passe n'est jamais stocké.)
-    errorBox.style.display = 'none';
-    document.getElementById('signupFields').style.display = 'none';
-    const { data, error } = await supabase.auth.signUp({
-
-email: email,
-
-password: password,
-
-options: {
-
-data: {
-
-full_name: fullName,
-
-school: school,
-
-program: program
-
 }
 
-}
-
-});
-
-
-
-if (error) {
-
-errorBox.innerHTML = error.message;
-
-errorBox.style.display = 'block';
-
-return;
-
-}
-
-
-
-document.getElementById('signupSuccess').style.display = 'block'; 
-
-  
-  function completeSignup() {
+function completeSignup() {
     // Si l'utilisatrice a choisi anglais comme langue préférée, on bascule l'appli
-    if (selectedPrefLang !== currentLang) {
-      toggleLanguage();
+    if (selectedPreflang !== currentLang) {
+        toggleLanguage();
     }
     showPage('accueil');
-  }
+}
 
-  /* ===== INITIALISATION AU CHARGEMENT DE LA PAGE ===== */
-  // On construit le menu des quartiers et on affiche la liste des logements
-  // dès l'ouverture de l'application (avant même que l'utilisateur clique sur Logements).
-  populateNeighborhoodOptions();
-  renderHousingList();
-  renderFavoritesList();
-  renderEventsList();
-  renderFavoriteEventsList();
-  renderPosts();
-  renderNotifications();
-  renderDashboard();
+/* ===== INITIALISATION AU CHARGEMENT DE LA PAGE ===== */
+// On construit le menu des quartiers et on affiche la liste des logements
+// dès l'ouverture de l'application (avant même que l'utilisateur clique sur Logements).
+populateNeighborhoodOptions();
+renderHousingList();
+renderFavoritesList();
+renderEventsList();
+renderFavoriteEventsList();
+renderPosts();
+renderNotifications();
+renderDashboard();
   </script>
 
   <!-- Chargement de la bibliothèque Supabase -->
