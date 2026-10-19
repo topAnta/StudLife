@@ -2129,38 +2129,75 @@
     document.getElementById('prefLangEnBtn').classList.toggle('selected', lang === 'en');
   }
 
-  async function validateSignup() {
-    const fullName = document.getElementById('fullNameInput').value.trim();
-    const email = document.getElementById('emailInput').value.trim();
-    const school = document.getElementById('schoolInput').value.trim();
-    const program = document.getElementById('programInput').value.trim();
-    const password = document.getElementById('passwordInput').value;
+ async function validateSignup() {
+  const fullName = document.getElementById('fullNameInput').value.trim();
+  const email = document.getElementById('emailInput').value.trim();
+  const school = document.getElementById('schoolInput').value.trim();
+  const program = document.getElementById('programInput').value.trim();
+  const password = document.getElementById('passwordInput').value;
 
-    const errors = [];
-    if (fullName === '') errors.push(t('err_fullname'));
-    if (email === '') {
-      errors.push(t('err_email'));
-    } else if (!email.includes('@') || !email.includes('.')) {
-      errors.push(t('err_email_format'));
-    }
-    if (school === '') errors.push(t('err_school'));
-    if (program === '') errors.push(t('err_program'));
-    if (password === '') {
-      errors.push(t('err_password'));
-    } else if (password.length < 6) {
-      errors.push(t('err_password_short'));
-    }
+  const errors = [];
+  if (fullName === '') errors.push(t('err_fullname'));
+  if (email === '') {
+    errors.push(t('err_email'));
+  } else if (!email.includes('@') || !email.includes('.')) {
+    errors.push(t('err_email_format'));
+  }
+  if (school === '') errors.push(t('err_school'));
+  if (program === '') errors.push(t('err_program'));
+  if (password === '') {
+    errors.push(t('err_password'));
+  } else if (password.length < 6) {
+    errors.push(t('err_password_short'));
+  }
 
-    const errorBox = document.getElementById('signupError');
-    if (errors.length > 0) {
-      // On affiche la liste des erreurs, sans jamais montrer le mot de passe tapé
-      errorBox.innerHTML = '<b>' + t('error_intro') + '</b><ul>' +
+  const errorBox = document.getElementById('signupError');
+
+  if (errors.length > 0) {
+    if (errorBox) {
+      errorBox.innerHTML = '<b>' + t('error_intro') + '</b><ul>' + 
         errors.map(e => '<li>' + e + '</li>').join('') + '</ul>';
       errorBox.style.display = 'block';
       errorBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
     }
+  } else {
+    if (errorBox) errorBox.style.display = 'none';
 
+    // 1. Inscription Supabase
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          full_name: fullName,
+          school: school,
+          program: program
+        }
+      }
+    });
+
+    if (error) {
+      if (errorBox) {
+        errorBox.textContent = error.message;
+        errorBox.style.display = 'block';
+      }
+    } else {
+      // 2. Mise à jour dynamique de la carte de profil
+      const profileName = document.getElementById('profileName');
+      const profileSchool = document.getElementById('profileSchool');
+      const profileProgram = document.getElementById('profileProgram');
+
+      if (profileName) profileName.textContent = fullName;
+      if (profileSchool) profileSchool.textContent = school;
+      if (profileProgram) profileProgram.textContent = program;
+
+      // 3. Affichage du profil
+      if (typeof showSection === 'function') {
+        showSection('profile');
+      }
+    }
+  }
+}
     // Pas d'erreur : on cache le formulaire et on affiche le succès
     // (Note pour plus tard : ici on enverra les infos à une vraie base de données.
     //  Pour l'instant, rien n'est sauvegardé et le mot de passe n'est jamais stocké.)
@@ -2204,7 +2241,7 @@ return;
 
 document.getElementById('signupSuccess').style.display = 'block'; 
 
-  }
+  
   function completeSignup() {
     // Si l'utilisatrice a choisi anglais comme langue préférée, on bascule l'appli
     if (selectedPrefLang !== currentLang) {
