@@ -320,7 +320,7 @@
       </div>
 
       <div id="forgotFields" style="display:none;">
-        <p class="auth-subtitle" style="margin-bottom:20px;" data-i18n="forgot_intro">Entre ton adresse courriel, on te dirait comment réinitialiser ton mot de passe (simulation).</p>
+        <p class="auth-subtitle" style="margin-bottom:20px;" data-i18n="forgot_intro">Entre ton adresse courriel, on t'enverra un lien pour réinitialiser ton mot de passe.</p>
         <div class="field-group">
           <span class="field-label" data-i18n="field_email_label">Adresse courriel</span>
           <div class="field-input"><i class="ti ti-mail"></i><input type="text" id="forgotEmailInput" placeholder="prenom.nom@courriel.uqam.ca"></div>
@@ -370,8 +370,8 @@
 
       <div id="forgotSuccess" class="success-box" style="display:none;">
         <div class="success-icon"><i class="ti ti-mail"></i></div>
-        <p class="success-title" data-i18n="forgot_success_title">Lien envoyé (simulation)</p>
-        <p class="success-message" data-i18n="forgot_success_message">Si un compte existait avec cette adresse, un lien de réinitialisation lui serait envoyé. Aucun email n'a réellement été envoyé.</p>
+        <p class="success-title" data-i18n="forgot_success_title">Lien envoyé</p>
+        <p class="success-message" data-i18n="forgot_success_message">Si un compte existe avec cette adresse, un lien de réinitialisation vient d'être envoyé.</p>
         <button class="primary-btn" data-i18n="back_to_login" onclick="backToLogin()">← Retour à la connexion</button>
       </div>
 
@@ -915,11 +915,11 @@
       forgot_password_alert: "Cette fonctionnalité sera bientôt disponible !",
       login_success_title: "Connexion réussie (simulation)",
       login_success_message: "Ceci est une simulation : aucune vérification réelle de compte n'est faite pour le moment. Une vraie authentification sera ajoutée plus tard avec une base de données.",
-      forgot_intro: "Entre ton adresse courriel, on te dirait comment réinitialiser ton mot de passe (simulation).",
+      forgot_intro: "Entre ton adresse courriel, on t'enverra un lien pour réinitialiser ton mot de passe.",
       forgot_submit: "Envoyer",
       back_to_login: "← Retour à la connexion",
-      forgot_success_title: "Lien envoyé (simulation)",
-      forgot_success_message: "Si un compte existait avec cette adresse, un lien de réinitialisation lui serait envoyé. Aucun email n'a réellement été envoyé.",
+      forgot_success_title: "Lien envoyé",
+      forgot_success_message: "Si un compte existe avec cette adresse, un lien de réinitialisation vient d'être envoyé.",
       courses_title: "Mes cours et mon horaire", view_list: "Liste", view_schedule: "Semaine",
       back_btn: "Retour", courses_short_title: "Cours et horaires", label_teacher: "Professeur",
       day_monday: "Lundi", no_class: "Aucun cours",
@@ -1004,11 +1004,11 @@
       forgot_password_alert: "This feature will be available soon!",
       login_success_title: "Login successful (simulation)",
       login_success_message: "This is a simulation: no real account check is done yet. Real authentication will be added later with a database.",
-      forgot_intro: "Enter your email, we would tell you how to reset your password (simulation).",
+      forgot_intro: "Enter your email, we will send you a link to reset your password.",
       forgot_submit: "Send",
       back_to_login: "← Back to login",
-      forgot_success_title: "Link sent (simulation)",
-      forgot_success_message: "If an account existed with this address, a reset link would be sent to it. No email was actually sent.",
+      forgot_success_title: "Link sent",
+      forgot_success_message: "If an account exists with this address, a reset link has just been sent.",
       courses_title: "My courses and schedule", view_list: "List", view_schedule: "Week",
       back_btn: "Back", courses_short_title: "Courses and schedule", label_teacher: "Instructor",
       day_monday: "Monday", no_class: "No class",
@@ -1168,9 +1168,11 @@
 
   // Déconnexion simulée : aucune vraie session n'existe, on ramène juste
   // la personne à l'écran de connexion, comme si elle s'était déconnectée.
-  function confirmLogout() {
+  async function confirmLogout() {
+    await sb.auth.signOut();
     hideAllProfileViews();
     document.getElementById('profileDisplayView').style.display = 'block';
+    pageHistory = [];
     showPage('auth');
     switchAuthTab('login');
   }
@@ -2072,10 +2074,25 @@
 
   // IMPORTANT : simulation seulement. Aucun email n'est réellement envoyé,
   // et aucun vrai compte n'est vérifié (pas de base de données pour le moment).
-  function validateForgotPassword() {
+  async function loadProfile(user) {
+    const res = await sb.from('profiles')
+      .select('full_name, school, program, city, language')
+      .eq('id', user.id).maybeSingle();
+    const p = res.data || {};
+    const meta = user.user_metadata || {};
+    profileData.name = p.full_name || meta.full_name || user.email;
+    profileData.school = p.school || meta.school || '—';
+    profileData.program = p.program || meta.program || '—';
+    profileData.city = p.city || '—';
+    profileData.language = p.language || meta.language || 'fr';
+    renderProfileDisplay();
+    renderDashboard();
+    if (profileData.language !== currentLang) toggleLanguage();
+  }
+
+  async function validateForgotPassword() {
     const email = document.getElementById('forgotEmailInput').value.trim();
     const errorBox = document.getElementById('forgotError');
-
     if (email === '') {
       errorBox.innerHTML = '<b>' + t('error_intro') + '</b><ul><li>' + t('err_email') + '</li></ul>';
       errorBox.style.display = 'block';
@@ -2086,28 +2103,33 @@
       errorBox.style.display = 'block';
       return;
     }
-
-    errorBox.style.display = 'none';
-    document.getElementById('forgotFields').style.display = 'none';
-    document.getElementById('forgotSuccess').style.display = 'block';
+    try {
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
+      if (error) {
+        errorBox.textContent = error.message;
+        errorBox.style.display = 'block';
+        return;
+      }
+      errorBox.style.display = 'none';
+      document.getElementById('forgotFields').style.display = 'none';
+      document.getElementById('forgotSuccess').style.display = 'block';
+    } catch (err) {
+      console.error(err);
+      errorBox.textContent = currentLang === 'fr' ? 'Erreur réseau, réessaie.' : 'Network error, try again.';
+      errorBox.style.display = 'block';
+    }
   }
 
-  // IMPORTANT : ceci est une simulation. Il n'y a pas encore de base de données,
-  // donc on ne peut pas vérifier un vrai mot de passe. On vérifie seulement que
-  // les champs sont bien remplis et que l'email a un format valide.
-  function validateLogin() {
+  async function validateLogin() {
     const email = document.getElementById('loginEmailInput').value.trim();
     const password = document.getElementById('loginPasswordInput').value;
+    const errorBox = document.getElementById('loginError');
 
     const errors = [];
-    if (email === '') {
-      errors.push(t('err_email'));
-    } else if (!email.includes('@') || !email.includes('.')) {
-      errors.push(t('err_email_format'));
-    }
+    if (email === '') errors.push(t('err_email'));
+    else if (!email.includes('@') || !email.includes('.')) errors.push(t('err_email_format'));
     if (password === '') errors.push(t('err_password'));
 
-    const errorBox = document.getElementById('loginError');
     if (errors.length > 0) {
       errorBox.innerHTML = '<b>' + t('error_intro') + '</b><ul>' +
         errors.map(e => '<li>' + e + '</li>').join('') + '</ul>';
@@ -2115,9 +2137,24 @@
       return;
     }
 
-    errorBox.style.display = 'none';
-    document.getElementById('loginFields').style.display = 'none';
-    document.getElementById('loginSuccess').style.display = 'block';
+    try {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        errorBox.textContent = currentLang === 'fr'
+          ? 'Courriel ou mot de passe incorrect.'
+          : 'Incorrect email or password.';
+        errorBox.style.display = 'block';
+        return;
+      }
+      errorBox.style.display = 'none';
+      await loadProfile(data.user);
+      document.getElementById('loginPasswordInput').value = '';
+      showPage('accueil');
+    } catch (err) {
+      console.error(err);
+      errorBox.textContent = currentLang === 'fr' ? 'Erreur réseau, réessaie.' : 'Network error, try again.';
+      errorBox.style.display = 'block';
+    }
   }
 
   /* ===== INSCRIPTION ===== */
@@ -2209,6 +2246,13 @@ renderDashboard();
     const SUPABASE_ANON_KEY = "sb_publishable_LAIF7vzTAazwXxW2yUEdRA_BcZL-jzO";
 
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    sb.auth.getSession().then(async ({ data }) => {
+      if (data.session) {
+        await loadProfile(data.session.user);
+        showPage('accueil');
+      }
+    });
   </script>
 
 </body>
