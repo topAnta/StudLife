@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>StudLife - Application</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; }
@@ -1824,6 +1824,30 @@
     });
     refreshPosts();
   }
+
+  function postsInputBusy() {
+    const a = document.activeElement;
+    const inPosts = function (el) { return el && el.closest && el.closest('#postsContainer, #groupPostsContainer'); };
+    if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA') && inPosts(a)) return true;
+    if (editingPostId !== null) return true;
+    const typed = document.querySelectorAll('#postsContainer input, #groupPostsContainer input');
+    for (let i = 0; i < typed.length; i++) {
+      if (typed[i].value && typed[i].value.trim() !== '') return true;
+    }
+    return false;
+  }
+
+  function startPostsAutoRefresh() {
+    setInterval(function () {
+      if (!currentUserId || document.hidden) return;
+      if (postsInputBusy()) return;
+      loadPosts();
+    }, 10000);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden && currentUserId && !postsInputBusy()) loadPosts();
+    });
+  }
+  startPostsAutoRefresh();
 
   async function createPost(inputId, groupKey) {
     const input = document.getElementById(inputId);
