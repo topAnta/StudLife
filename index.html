@@ -1288,6 +1288,7 @@
     });
     if (name === 'accueil') renderDashboard();
     if (name === 'communaute' || name === 'group-detail') loadPosts();
+    if (name === 'evenements' || name === 'logements') loadAppData();
   }
 
   // Fonction réutilisable pour tous les boutons "Retour" : ramène à la page
@@ -1298,56 +1299,12 @@
   }
 
   /* ===== LOGEMENTS ===== */
-  const listings = [
-    {
-      title: { fr: "Studio près de l'UdeM", en: "Studio near UdeM" },
-      price: { fr: "650 $ / mois", en: "650 $ / month" },
-      priceValue: 650,
-      typeKey: "studio",
-      neighborhoodKey: "udem",
-      neighborhoodLabel: { fr: "Près de l'UdeM", en: "Near UdeM" },
-      icon: "ti-building",
-      tags: [
-        { fr: "Meublé", en: "Furnished" },
-        { fr: "Chauffage inclus", en: "Heating included" }
-      ],
-      addr: { fr: "Studio · 12 min de marche de l'UdeM", en: "Studio · 12 min walk from UdeM" },
-      size: "28 m²",
-      rooms: { fr: "1 chambre", en: "1 bedroom" },
-      desc: {
-        fr: "Studio lumineux et rénové, à distance de marche du campus. Idéal pour un étudiant, épicerie et transport en commun à proximité.",
-        en: "Bright, renovated studio within walking distance of campus. Ideal for a student, grocery store and public transit nearby."
-      },
-      roommateName: { fr: "Alex, 21 ans", en: "Alex, 21 years old" },
-      roommateInfo: { fr: "Génie logiciel · Non-fumeur", en: "Software Engineering · Non-smoker" }
-    },
-    {
-      title: { fr: "Coloc 3 1/2 - Plateau Mont-Royal", en: "3-bedroom apt - Plateau Mont-Royal" },
-      price: { fr: "480 $ / mois", en: "480 $ / month" },
-      priceValue: 480,
-      typeKey: "colocation",
-      neighborhoodKey: "plateau",
-      neighborhoodLabel: { fr: "Plateau Mont-Royal", en: "Plateau Mont-Royal" },
-      icon: "ti-home",
-      tags: [
-        { fr: "2 colocataires", en: "2 roommates" },
-        { fr: "Animaux ok", en: "Pets ok" }
-      ],
-      addr: { fr: "Coloc 3 1/2 · Plateau Mont-Royal", en: "3-bedroom apt · Plateau Mont-Royal" },
-      size: "45 m²",
-      rooms: { fr: "3 chambres", en: "3 bedrooms" },
-      desc: {
-        fr: "Grand appartement partagé, proche du métro et des restos du Plateau. Ambiance conviviale, animaux acceptés.",
-        en: "Large shared apartment, close to the metro and Plateau restaurants. Friendly vibe, pets welcome."
-      },
-      roommateName: { fr: "Jade, 22 ans", en: "Jade, 22 years old" },
-      roommateInfo: { fr: "Sciences politiques · A un chat", en: "Political Science · Has a cat" }
-    }
-  ];
+  let listings = [];
 
   let currentListingIndex = 0;
 
   function renderListingText(index) {
+    if (!listings[index]) return;
     const l = listings[index];
     document.getElementById('dPrice').textContent = l.price[currentLang];
     document.getElementById('dAddr').textContent = l.addr[currentLang];
@@ -1987,53 +1944,10 @@
   }
 
   /* ===== EVENEMENTS ===== */
-  const events = [
-    {
-      dayNum: 25, mon: { fr: "Sept", en: "Sep" },
-      listMeta: { fr: "17h00 · Pavillon A", en: "5:00 PM · Building A" },
-      category: { fr: "Mon programme", en: "My program" }, categoryKey: "program",
-      title: { fr: "5 à 7 - Génie logiciel", en: "Networking - Software Engineering" },
-      date: { fr: "Jeudi 25 septembre 2026", en: "Thursday, September 25, 2026" },
-      time: { fr: "17h00 - 19h00", en: "5:00 PM - 7:00 PM" },
-      location: { fr: "Pavillon A, salle commune", en: "Building A, common room" },
-      desc: {
-        fr: "Viens réseauter avec les étudiants et diplômés du programme autour de bouchées et boissons non-alcoolisées.",
-        en: "Come network with students and alumni of the program over snacks and non-alcoholic drinks."
-      },
-      attendees: 42
-    },
-    {
-      dayNum: 27, mon: { fr: "Sept", en: "Sep" },
-      listMeta: { fr: "10h00 · Bibliothèque", en: "10:00 AM · Library" },
-      category: { fr: "Étude", en: "Study" }, categoryKey: "study",
-      title: { fr: "Groupe d'étude - Statistiques", en: "Study group - Statistics" },
-      date: { fr: "Samedi 27 septembre 2026", en: "Saturday, September 27, 2026" },
-      time: { fr: "10h00 - 12h00", en: "10:00 AM - 12:00 PM" },
-      location: { fr: "Bibliothèque, salle 204", en: "Library, room 204" },
-      desc: {
-        fr: "Révision en groupe avant l'examen de mi-session. Apporte tes notes et tes questions, on répond ensemble.",
-        en: "Group review before the midterm exam. Bring your notes and questions, we'll go through them together."
-      },
-      attendees: 15
-    },
-    {
-      dayNum: 3, mon: { fr: "Oct", en: "Oct" },
-      listMeta: { fr: "14h00 · Pavillon sportif", en: "2:00 PM · Sports building" },
-      category: { fr: "Sportif", en: "Sports" }, categoryKey: "sport",
-      title: { fr: "Match de volleyball amical", en: "Friendly volleyball match" },
-      date: { fr: "Samedi 3 octobre 2026", en: "Saturday, October 3, 2026" },
-      time: { fr: "14h00 - 16h00", en: "2:00 PM - 4:00 PM" },
-      location: { fr: "Pavillon sportif, gymnase 2", en: "Sports building, gym 2" },
-      desc: {
-        fr: "Match amical ouvert à tous les niveaux, aucune inscription requise. Vient avec des espadrilles de gymnase.",
-        en: "Friendly match open to all levels, no registration required. Bring indoor gym shoes."
-      },
-      attendees: 24
-    }
-  ];
+  let events = [];
 
   let currentEventIndex = 0;
-  const rsvpStatus = [false, false, false];
+  let rsvpStatus = [];
   let eventFavorites = [];
 
   function isEventFavorite(index) {
@@ -2109,6 +2023,7 @@
   }
 
   function renderEventText(index) {
+    if (!events[index]) return;
     const e = events[index];
     document.getElementById('eCat').textContent = e.category[currentLang];
     document.getElementById('eTitle').textContent = e.title[currentLang];
@@ -2127,6 +2042,7 @@
   }
 
   function updateRsvpDisplay() {
+    if (!events[currentEventIndex]) return;
     const btn = document.getElementById('rsvpBtn');
     const count = document.getElementById('attendeesCount');
     const e = events[currentEventIndex];
@@ -2195,6 +2111,7 @@
   // et aucun vrai compte n'est vérifié (pas de base de données pour le moment).
   async function loadProfile(user) {
     currentUserId = user.id;
+    loadAppData();
     loadPosts();
     const res = await sb.from('profiles')
       .select('full_name, school, program, city, language')
@@ -2345,7 +2262,175 @@ function completeSignup() {
     showPage('accueil');
 }
 
-/* ===== INITIALISATION AU CHARGEMENT DE LA PAGE ===== */
+/* ===== LOGEMENTS ET ÉVÉNEMENTS DEPUIS SUPABASE ===== */
+  const MONTHS_APP = {
+    fr: ['Janv', 'Févr', 'Mars', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sept', 'Oct', 'Nov', 'Déc'],
+    en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  };
+
+  function capFirst(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function fmtClock(d, lang) {
+    const h = d.getHours();
+    const m = String(d.getMinutes()).padStart(2, '0');
+    if (lang === 'fr') return h + 'h' + m;
+    const h12 = h % 12 || 12;
+    return h12 + ':' + m + ' ' + (h < 12 ? 'AM' : 'PM');
+  }
+
+  async function loadAppData() {
+    if (typeof sb === 'undefined' || !currentUserId) return;
+    const results = await Promise.all([
+      sb.from('listings').select('*').order('id', { ascending: true }),
+      sb.from('events').select('*').order('starts_at', { ascending: true }),
+      sb.from('listing_favorites').select('listing_id').eq('user_id', currentUserId),
+      sb.from('event_favorites').select('event_id').eq('user_id', currentUserId),
+      sb.from('event_attendees').select('event_id, user_id')
+    ]);
+    const lr = results[0], er = results[1], lf = results[2], ef = results[3], ea = results[4];
+    if (lr.error || er.error) {
+      console.error('Erreur chargement données :', lr.error || er.error);
+      return;
+    }
+
+    listings = (lr.data || []).map(function (r) {
+      const tags = (r.tags || []).slice(0, 2);
+      while (tags.length < 2) tags.push({ fr: '', en: '' });
+      return {
+        id: r.id,
+        title: r.title,
+        price: { fr: r.price_value + ' $ / mois', en: r.price_value + ' $ / month' },
+        priceValue: r.price_value,
+        typeKey: r.type_key,
+        neighborhoodKey: r.neighborhood_key,
+        neighborhoodLabel: r.neighborhood_label,
+        icon: r.icon || 'ti-home',
+        tags: tags,
+        addr: r.address || { fr: '', en: '' },
+        size: r.size || '',
+        rooms: r.rooms || { fr: '', en: '' },
+        desc: r.description || { fr: '', en: '' },
+        roommateName: r.roommate_name || { fr: '', en: '' },
+        roommateInfo: r.roommate_info || { fr: '', en: '' }
+      };
+    });
+
+    const attendeeRows = ea.data || [];
+    const dateOpts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    events = (er.data || []).map(function (r) {
+      const s = new Date(r.starts_at);
+      const e = r.ends_at ? new Date(r.ends_at) : null;
+      const loc = r.location || { fr: '', en: '' };
+      const rows = attendeeRows.filter(function (a) { return a.event_id === r.id; });
+      const mine = rows.some(function (a) { return a.user_id === currentUserId; });
+      return {
+        id: r.id,
+        dayNum: s.getDate(),
+        mon: { fr: MONTHS_APP.fr[s.getMonth()], en: MONTHS_APP.en[s.getMonth()] },
+        listMeta: {
+          fr: fmtClock(s, 'fr') + ' · ' + String(loc.fr || '').split(',')[0],
+          en: fmtClock(s, 'en') + ' · ' + String(loc.en || '').split(',')[0]
+        },
+        category: r.category,
+        categoryKey: r.category_key,
+        title: r.title,
+        date: {
+          fr: capFirst(s.toLocaleDateString('fr-CA', dateOpts)),
+          en: capFirst(s.toLocaleDateString('en-CA', dateOpts))
+        },
+        time: {
+          fr: fmtClock(s, 'fr') + (e ? ' - ' + fmtClock(e, 'fr') : ''),
+          en: fmtClock(s, 'en') + (e ? ' - ' + fmtClock(e, 'en') : '')
+        },
+        location: loc,
+        desc: r.description || { fr: '', en: '' },
+        attendees: rows.length - (mine ? 1 : 0)
+      };
+    });
+
+    const favListingIds = (lf.data || []).map(function (x) { return x.listing_id; });
+    const favEventIds = (ef.data || []).map(function (x) { return x.event_id; });
+    favoriteListingIndices = [];
+    listings.forEach(function (l, i) { if (favListingIds.indexOf(l.id) !== -1) favoriteListingIndices.push(i); });
+    eventFavorites = [];
+    events.forEach(function (ev, i) { if (favEventIds.indexOf(ev.id) !== -1) eventFavorites.push(i); });
+    rsvpStatus = events.map(function (ev) {
+      return attendeeRows.some(function (a) { return a.event_id === ev.id && a.user_id === currentUserId; });
+    });
+
+    populateNeighborhoodOptions();
+    renderHousingList();
+    renderFavoritesList();
+    renderEventsList();
+    renderFavoriteEventsList();
+    renderDashboard();
+    if (document.getElementById('page-evenement-detail').classList.contains('active')) updateRsvpDisplay();
+  }
+
+  async function persistToggle(table, col, id, nowOn) {
+    if (typeof sb === 'undefined' || !currentUserId || id === undefined) return;
+    let res;
+    if (nowOn) {
+      const row = {};
+      row[col] = id;
+      res = await sb.from(table).insert(row);
+    } else {
+      res = await sb.from(table).delete().eq(col, id).eq('user_id', currentUserId);
+    }
+    if (res.error) console.error('Erreur ' + table, res.error);
+  }
+
+  const _origToggleFavoriteListing = toggleFavoriteListing;
+  toggleFavoriteListing = function (index, event) {
+    const l = listings[index];
+    if (!l) return;
+    const wasFav = isListingFavorite(index);
+    _origToggleFavoriteListing(index, event);
+    persistToggle('listing_favorites', 'listing_id', l.id, !wasFav);
+  };
+
+  const _origToggleFavoriteEvent = toggleFavoriteEvent;
+  toggleFavoriteEvent = function (index, event) {
+    const ev = events[index];
+    if (!ev) return;
+    const wasFav = isEventFavorite(index);
+    _origToggleFavoriteEvent(index, event);
+    persistToggle('event_favorites', 'event_id', ev.id, !wasFav);
+  };
+
+  const _origToggleRsvp = toggleRsvp;
+  toggleRsvp = function () {
+    const idx = currentEventIndex;
+    const ev = events[idx];
+    if (!ev) return;
+    const wasGoing = rsvpStatus[idx];
+    _origToggleRsvp();
+    persistToggle('event_attendees', 'event_id', ev.id, !wasGoing);
+  };
+
+  const _origShowEvent = showEvent;
+  showEvent = function (i) { if (!events[i]) return; _origShowEvent(i); };
+
+  const _origShowListing = showListing;
+  showListing = function (i) { if (!listings[i]) return; _origShowListing(i); };
+
+  const _origConfirmLogout = confirmLogout;
+  confirmLogout = async function () {
+    await _origConfirmLogout();
+    listings = [];
+    events = [];
+    rsvpStatus = [];
+    favoriteListingIndices = [];
+    eventFavorites = [];
+    populateNeighborhoodOptions();
+    renderHousingList();
+    renderFavoritesList();
+    renderEventsList();
+    renderFavoriteEventsList();
+    renderDashboard();
+  };
+
+  /* ===== INITIALISATION AU CHARGEMENT DE LA PAGE ===== */
 // On construit le menu des quartiers et on affiche la liste des logements
 // dès l'ouverture de l'application (avant même que l'utilisateur clique sur Logements).
 populateNeighborhoodOptions();
