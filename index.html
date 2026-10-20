@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>StudentLife - Application</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -279,13 +279,34 @@
   .dash-quick-btn { border: 1px solid #F5E6D8; background: #fff; border-radius: 12px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .dash-quick-btn i { font-size: 17px; color: #FF6B4A; }
   .dash-quick-btn span { font-size: 9.5px; color: #3A2E28; font-weight: 500; text-align: center; }
+
+  /* ===== AFFICHAGE ADAPTE ===== */
+  .caption { display: none; }
+  .top-bar { margin-bottom: 12px; }
+  @media (max-width: 480px) {
+    body { display: block; padding: 0; background: #FFF6EE; }
+    .top-bar {
+      width: 100%; margin: 0; min-height: 44px;
+      padding: env(safe-area-inset-top, 0px) 14px 0;
+      justify-content: flex-end;
+      background: linear-gradient(160deg, #FFF6EE 0%, #FFEDE0 100%);
+    }
+    .phone {
+      width: 100%;
+      height: calc(100vh - 44px - env(safe-area-inset-top, 0px));
+      height: calc(100dvh - 44px - env(safe-area-inset-top, 0px));
+      border-radius: 0; box-shadow: none;
+    }
+    .navbar { padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+  }
 </style>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Crect%20width%3D'100'%20height%3D'100'%20rx%3D'24'%20fill%3D'%23FF7A5C'%2F%3E%3Ctext%20x%3D'50'%20y%3D'70'%20font-size%3D'58'%20text-anchor%3D'middle'%3E%F0%9F%8E%93%3C%2Ftext%3E%3C%2Fsvg%3E">
+<meta name="theme-color" content="#FF7A5C">
 </head>
 <body>
 
 <div style="display:flex; flex-direction:column; align-items:center;">
 <div class="top-bar">
-  <p class="caption" data-i18n="caption">Prototype interactif StudLife — clique sur les boutons !</p>
   <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">EN</button>
 </div>
 <div class="phone">
